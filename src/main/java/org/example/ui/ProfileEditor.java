@@ -14,7 +14,7 @@ public class ProfileEditor extends JFrame {
     public ProfileEditor(int profileId) {
         this.profileId = profileId;
         setTitle("Edit Profile");
-        setSize(300, 250);
+        setSize(350, 250);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -26,20 +26,17 @@ public class ProfileEditor extends JFrame {
         dobField = new JTextField();
 
         JButton save = new JButton("Save Changes");
-        JButton back = new JButton("Back");
+        JButton close = new JButton("Close");
         status = new JLabel("");
 
         panel.add(new JLabel("DOB (yyyy-mm-dd):")); panel.add(dobField);
         panel.add(new JLabel("Height (cm):")); panel.add(heightField);
         panel.add(new JLabel("Weight (kg):")); panel.add(weightField);
-        panel.add(save); panel.add(status); panel.add(back);
+        panel.add(save); panel.add(status); panel.add(close);
 
         loadProfile();
 
-        back.addActionListener(e -> {
-            new Dashboard(profileId).setVisible(true);
-            dispose();
-        });
+        close.addActionListener(e -> dispose());
 
         save.addActionListener(e -> {
             try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
