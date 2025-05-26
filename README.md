@@ -20,7 +20,6 @@ NutriSci is a Java-based desktop app that lets users explore nutrient data from 
 
 | Tool            | Version          | Notes                        |
 |-----------------|------------------|------------------------------|
-| macOS           | Ventura / Sonoma | Tested on M1 Mac             |
 | JDK             | `OpenJDK 23.0.2` | Installed via Homebrew       |
 | IntelliJ IDEA   | CE (2024.1+)     | Maven support included       |
 | MySQL           | `brew install mysql` | Version 8+ preferred    |
