@@ -1,16 +1,18 @@
-# 🥦 NutriSci 
+# 🥦 NutriSci  
 By Team Bravo | EECS 3311 — Summer 2025
 
-NutriSci is a Java-based desktop app that lets users explore nutrient data from the **Canadian Nutrient File (CNF 2015)**. You can view nutritional details, serving sizes, and eventually build personalized profiles and nutrition recommendations.
+NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL, and CNF 2015 data. It allows users to create personalized profiles, run nutrition queries (like "Vitamin C in apples"), and log meals for nutrient tracking — with support for visualizations and intelligent food recommendations coming soon.
 
 ---
 
 ## ✅ Features
 
-- Load CNF 2015 dataset (13 CSVs) into MySQL automatically
-- Run nutrition queries like "Vitamin C in apples"
-- Search food and nutrients using Java + SQL
-- Ready for profile editing, nutrient charts (JFreeChart), and more
+- 📊 Load the **CNF 2015 dataset** (13 CSVs) into MySQL automatically
+- 🔍 Query nutrients in real food data (Java + SQL)
+- 👤 Create and manage **user nutrition profiles**
+- 🧑‍💼 Splash screen to select an existing user or create a new one
+- ✏️ Edit profile attributes (height, weight, DOB, units)
+- 🔗 Foundation for meal logging, charting, and swap suggestions
 
 ---
 
@@ -45,7 +47,7 @@ cd NutriSci
 brew services start mysql
 ```
 
-Then in terminal:
+Then enter MySQL:
 
 ```bash
 mysql -u root
@@ -54,21 +56,21 @@ CREATE DATABASE nutriscidb;
 
 ---
 
-### 🧱 3. Load Table Schema
+### 🧱 3. Load CNF Table Schema
 
-Run the provided ordered table script:
+Run this in terminal:
 
 ```bash
 mysql -u root nutriscidb < create_cnf_tables_ordered.sql
 ```
 
-This creates all 13 CNF tables in dependency order with foreign keys.
+This creates all 13 CNF tables with foreign keys in dependency order.
 
 ---
 
 ### 📥 4. Place CNF CSVs
 
-Put all these files into a `data/` folder in your project root:
+Put all these into `data/` at the project root:
 
 ```
 data/
@@ -86,11 +88,11 @@ data/
 ├── YIELD NAME.csv
 ```
 
-> ⚠️ Do not commit this folder — it's ignored by `.gitignore`.
+> ⚠️ `data/` is ignored by `.gitignore`
 
 ---
 
-### 🚀 5. Run the Loader
+### 🚀 5. Load Data with Java
 
 In IntelliJ, run:
 
@@ -98,26 +100,26 @@ In IntelliJ, run:
 CNFImporter.java
 ```
 
-This uses OpenCSV and JDBC to insert all data safely with error handling and duplicate skips.
+This loads all CSVs into MySQL using `OpenCSV`, skipping duplicates and malformed rows with error handling.
 
 ---
 
-### 🧪 6. Run the Test Query
+### 🔍 6. Test Queries (Optional)
 
-To confirm data is in MySQL:
+To confirm data loaded properly, run:
 
 ```java
 CNFTestQuery.java
 ```
 
-Expected output:
+Example expected output:
 
 ```
 ✅ Sample food_name rows:
  - 2: Cheese souffle
 ...
 
-🔍 Non-zero nutrients for 'apple':
+🔍 Nutrients for 'apple':
  - CARBOHYDRATE, TOTAL: 11.43 g
  - SUGARS: 9.23 g
 ...
@@ -125,38 +127,169 @@ Expected output:
 
 ---
 
-## 🧾 File Structure
+## 👤 User Profile System
 
-```
-NutriSci/
-├── src/main/java/org/example/
-│   ├── CSVLoader.java         # Loads CSVs using OpenCSV
-│   ├── CNFImporter.java       # Main entrypoint for loading
-│   └── CNFTestQuery.java      # Sample queries
-├── create_cnf_tables_ordered.sql
-├── README.md
-├── .gitignore
-└── data/                      # Ignored CSV folder
+Users can create, select, and update personal nutrition profiles. Each user profile contains:
+
+* Name
+* Sex (`Male`, `Female`, `Other`)
+* Date of birth
+* Height (cm)
+* Weight (kg)
+* Units (`Metric` or `Imperial`)
+
+---
+
+### 🧾 SQL Table: `user_profile`
+
+```sql
+CREATE TABLE IF NOT EXISTS user_profile (
+    ProfileID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Sex ENUM('Male', 'Female', 'Other') NOT NULL,
+    DateOfBirth DATE NOT NULL,
+    Height_cm DECIMAL(5,2) NOT NULL,
+    Weight_kg DECIMAL(5,2) NOT NULL,
+    Units ENUM('Metric', 'Imperial') NOT NULL,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
 ---
 
-## ✅ Next Steps for Team
+### 👨‍💻 Profile UI (Java Swing)
 
-* Build `UserProfile` model and DAO
-* Create `ProfileForm.java` (Java Swing UI)
-* Add splash screen to choose profile
-* Connect nutrient display to user settings
-* Optional: Visualize nutrient data (JFreeChart)
+#### 1. Splash Screen
+
+```java
+ProfileSelector.java
+```
+
+* Shows dropdown of all saved profiles
+* Button to create new profile via `ProfileForm`
+* Proceeds to `Dashboard` on selection
+
+#### 2. Profile Creation
+
+```java
+ProfileForm.java
+```
+
+* Enter name, DOB, height, weight, units
+* On save → data is inserted into MySQL
+* Redirects to `Dashboard`
+
+#### 3. Profile Editor
+
+```java
+ProfileEditor.java
+```
+
+* Allows editing of DOB, height, and weight
+* Saves changes to MySQL with update query
+* Has "Back to Dashboard" button
+
+#### 4. Dashboard
+
+```java
+Dashboard.java
+```
+
+* Displays interactive cards for features:
+
+  * Edit Profile
+  * Log Meal *(coming soon)*
+  * Visualize Nutrients *(coming soon)*
+  * Food Swaps *(coming soon)*
+
+
+---
+
+### 🎬 Launch the App UI
+
+To start the full desktop UI with profile selection:
+
+> 💡 Make sure you’ve already created the `user_profile` table and loaded CNF data using `CNFImporter`.
+
+---
+
+#### 🖥️ Option 1: Run from IntelliJ
+
+1. Open `ProfileSelector.java`
+2. Right-click anywhere in the file → `Run ProfileSelector.main()`
+
+This will open the **Splash Screen**, where you can:
+
+* Select an existing profile
+* Create a new profile (via `ProfileForm`)
+* Proceed to the **Dashboard**
+
+---
+
+#### 🖥️ Option 2: Run from Terminal
+
+From project root (if you’ve packaged your app):
+
+```bash
+cd target
+java -cp classes org.example.ui.ProfileSelector
+```
+
+Or use the full `mvn compile exec` setup if needed.
+
+---
+
+### 🔁 UI Navigation Flow
+
+| Screen         | File              | Trigger                      |
+| -------------- | ----------------- | ---------------------------- |
+| Splash screen  | `ProfileSelector` | App launch                   |
+| Create profile | `ProfileForm`     | Click “Create New Profile”   |
+| Dashboard      | `Dashboard`       | After selecting a profile    |
+| Edit profile   | `ProfileEditor`   | From dashboard → Edit button |
+
+---
+
+## 🗂️ File Structure
+
+```
+NutriSci/
+├── src/
+│   └── main/java/org/example/
+│       ├── model/
+│       │   └── UserProfile.java
+│       ├── ui/
+│       │   ├── ProfileForm.java
+│       │   ├── ProfileSelector.java
+│       │   ├── ProfileEditor.java
+│       │   └── Dashboard.java
+│       ├── CSVLoader.java
+│       ├── CNFImporter.java
+│       └── CNFTestQuery.java
+├── create_cnf_tables_ordered.sql
+├── .gitignore
+├── README.md
+└── data/                  # contains all CNF CSVs (ignored)
+```
+
+---
+
+## 🔭 Coming Soon
+
+* 🧾 Meal logging (per date/meal type)
+* 🔁 Smart food swaps (goal-driven replacements)
+* 📈 Nutrient comparisons (before/after swap)
+* 📊 Charts using JFreeChart
+* 🥗 Canada Food Guide alignment visualization
 
 ---
 
 ## 📚 References
 
-* Canadian Nutrient File 2015
+* **Canadian Nutrient File 2015**
   [https://food-nutrition.canada.ca/cnf-fce/](https://food-nutrition.canada.ca/cnf-fce/)
 
-* Health Canada Open Data License
+* **Open Government License (Canada)**
   [https://open.canada.ca/en/open-government-licence-canada](https://open.canada.ca/en/open-government-licence-canada)
 
 ---
@@ -164,5 +297,4 @@ NutriSci/
 ## 👩‍💻 Contributors
 
 * Shaf Muhammad
-* Team Bravo — EECS 3311
-
+* Team Bravo — EECS 3311 Summer 2025
