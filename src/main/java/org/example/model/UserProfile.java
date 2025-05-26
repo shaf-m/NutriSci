@@ -23,6 +23,16 @@ public class UserProfile {
         this.units = units;
     }
 
+    public UserProfile(int profileID, String name, String sex, Date dateOfBirth, double heightCm, double weightKg, String units) {
+        this.profileID = profileID;
+        this.name = name;
+        this.sex = sex;
+        this.dateOfBirth = dateOfBirth;
+        this.heightCm = heightCm;
+        this.weightKg = weightKg;
+        this.units = units;
+    }
+
     public int getProfileID() { return profileID; }
     public void setProfileID(int profileID) { this.profileID = profileID; }
 
