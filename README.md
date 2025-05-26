@@ -256,9 +256,12 @@ Or use the full `mvn compile exec` setup if needed.
 NutriSci/
 ├── src/
 │   └── main/java/org/example/
+│       ├── dao/
+│       │   └── UserProfileDAO.java
 │       ├── model/
 │       │   └── UserProfile.java
 │       ├── ui/
+│       │   ├── BMRWindow.java
 │       │   ├── ProfileForm.java
 │       │   ├── ProfileSelector.java
 │       │   ├── ProfileEditor.java
