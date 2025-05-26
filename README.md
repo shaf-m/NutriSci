@@ -1,4 +1,4 @@
-# 🥦 NutriSci: CNF Nutrition Database App  
+# 🥦 NutriSci 
 By Team Bravo | EECS 3311 — Summer 2025
 
 NutriSci is a Java-based desktop app that lets users explore nutrient data from the **Canadian Nutrient File (CNF 2015)**. You can view nutritional details, serving sizes, and eventually build personalized profiles and nutrition recommendations.
