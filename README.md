@@ -235,14 +235,16 @@ java -cp classes org.example.ui.ProfileSelector
 
 ### ♻️ UI Navigation Flow
 
-| Screen         | File              | Trigger                      |
-| -------------- | ----------------- | ---------------------------- |
-| Splash screen  | `ProfileSelector` | App launch                   |
-| Create profile | `ProfileForm`     | Click “Create New Profile”   |
-| Dashboard      | `Dashboard`       | After selecting a profile    |
-| Edit profile   | `ProfileEditor`   | From dashboard → Edit        |
-| Log Meal       | `MealLogger`      | From dashboard → Log button  |
-| View Meals     | `MealViewer`      | From dashboard → View button |
+| Screen         | File                   | Trigger                      |
+| -------------- | -----------------      | ---------------------------- |
+| Splash screen  | `ProfileSelector`      | App launch                   |
+| Create profile | `ProfileForm`          | Click “Create New Profile”   |
+| Dashboard      | `Dashboard`            | After selecting a profile    |
+| Edit profile   | `ProfileEditor`        | From dashboard → Edit        |
+| Log Meal       | `MealLogger`           | From dashboard → Log button  |
+| View Meals     | `MealViewer`           | From dashboard               |
+| View BMR       | `BMRWindow`            | From dashboard               |
+| View Macros    | `NutrientChartWindow`  | From dashboard               |
 
 ---
 
@@ -266,6 +268,8 @@ NutriSci/
 │       │   ├── Dashboard.java
 │       │   ├── MealLogger.java
 │       │   ├── MealViewer.java
+│       │   ├── NutrientChartPanel.java
+│       │   ├── NutrientChartWindow.java
 │       │   └── BMRWindow.java
 │       ├── CSVLoader.java
 │       ├── CNFImporter.java
@@ -273,7 +277,7 @@ NutriSci/
 ├── create_cnf_tables_ordered.sql
 ├── .gitignore
 ├── README.md
-└── data/                  # contains all CNF CSVs (ignored)
+└── data/                  # contains all CNF CSVs (ignored by Git)
 ```
 
 ---
