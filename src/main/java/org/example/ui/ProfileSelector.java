@@ -36,7 +36,8 @@ class Dashboard extends JFrame {
         container.add(makeCard("👤 Edit Profile", e -> new ProfileEditor(profileId).setVisible(true)));
         container.add(makeCard("📈 View My BMR", e -> new BMRWindow(profileId).setVisible(true)));
         container.add(makeCard("📊 Visualize Nutrients", null));
-        container.add(makeCard("📖 Log a Meal", null));
+        container.add(makeCard("📖 Log a Meal", e -> new MealLogger(profileId).setVisible(true)));
+        container.add(makeCard("🍽️ View My Meals", e -> new MealViewer(profileId).setVisible(true)));
         container.add(makeCard("🔁 Suggest Swaps", null));
         container.add(makeCard("📉 Compare Intake (Before/After)", null));
         container.add(makeCard("🥗 Align with Canada Food Guide", null));
