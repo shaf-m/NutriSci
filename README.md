@@ -1,18 +1,20 @@
-# 🥦 NutriSci  
+# 🥦 NutriSci
+
 By Team Bravo | EECS 3311 — Summer 2025
 
-NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL, and CNF 2015 data. It allows users to create personalized profiles, run nutrition queries (like "Vitamin C in apples"), and log meals for nutrient tracking — with support for visualizations and intelligent food recommendations coming soon.
+NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL, and CNF 2015 data. It allows users to create personalized profiles, log meals, analyze nutrient intake (like calories, carbs, iron, etc.), and visualize meal information — with support for smart food swaps and charts coming soon.
 
 ---
 
 ## ✅ Features
 
-- 📊 Load the **CNF 2015 dataset** (13 CSVs) into MySQL automatically
-- 🔍 Query nutrients in real food data (Java + SQL)
-- 👤 Create and manage **user nutrition profiles**
-- 🧑‍💼 Splash screen to select an existing user or create a new one
-- ✏️ Edit profile attributes (height, weight, DOB, units)
-- 🔗 Foundation for meal logging, charting, and swap suggestions
+* 📊 Load the **CNF 2015 dataset** (13 CSVs) into MySQL automatically
+* 🔍 Query real food nutrients and log meals with nutrient summaries
+* 👤 Create and manage **user nutrition profiles**
+* 🧑‍🎼 Splash screen to select an existing user or create a new one
+* ✏️ Edit profile attributes (height, weight, DOB, units)
+* 🍽️ **Log daily meals** and view calories, protein, fat, etc.
+* 📜 Meal history viewer with full nutrition breakdowns
 
 ---
 
@@ -20,12 +22,12 @@ NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL
 
 ### 📦 Prerequisites
 
-| Tool            | Version          | Notes                        |
-|-----------------|------------------|------------------------------|
-| JDK             | `OpenJDK 23.0.2` | Installed via Homebrew       |
-| IntelliJ IDEA   | CE (2024.1+)     | Maven support included       |
-| MySQL           | `brew install mysql` | Version 8+ preferred    |
-| GitHub Desktop  | Optional         | For repo sync                |
+| Tool           | Version              | Notes                  |
+| -------------- | -------------------- | ---------------------- |
+| JDK            | `OpenJDK 23.0.2`     | Installed via Homebrew |
+| IntelliJ IDEA  | CE (2024.1+)         | Maven support included |
+| MySQL          | `brew install mysql` | Version 8+ preferred   |
+| GitHub Desktop | Optional             | For repo sync          |
 
 ---
 
@@ -35,13 +37,13 @@ NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL
 cd ~/IdeaProjects
 git clone https://github.com/YOUR_USERNAME/NutriSci.git
 cd NutriSci
-````
+```
 
 > Make sure `NutriSci/` is your IntelliJ project root (not nested inside another `NutriSci/` folder).
 
 ---
 
-### 🧪 2. Start MySQL
+### 🥪 2. Start MySQL
 
 ```bash
 brew services start mysql
@@ -56,7 +58,7 @@ CREATE DATABASE nutriscidb;
 
 ---
 
-### 🧱 3. Load CNF Table Schema
+### 🚱 3. Load CNF Table Schema
 
 Run this in terminal:
 
@@ -85,7 +87,7 @@ data/
 ├── REFUSE AMOUNT.csv
 ├── REFUSE NAME.csv
 ├── YIELD AMOUNT.csv
-├── YIELD NAME.csv
+└── YIELD NAME.csv
 ```
 
 > ⚠️ `data/` is ignored by `.gitignore`
@@ -140,7 +142,7 @@ Users can create, select, and update personal nutrition profiles. Each user prof
 
 ---
 
-### 🧾 SQL Table: `user_profile`
+### 📟 SQL Table: `user_profile`
 
 ```sql
 CREATE TABLE IF NOT EXISTS user_profile (
@@ -157,115 +159,114 @@ CREATE TABLE IF NOT EXISTS user_profile (
 
 ---
 
-### 👨‍💻 Profile UI (Java Swing)
+## 🍽️ Meal Logging
 
-#### 1. Splash Screen
+Users can log meals (breakfast, lunch, dinner, snacks) and specify food items and quantities. The app automatically calculates nutrients using CNF data.
 
-```java
-ProfileSelector.java
+### 📋 SQL Table: `meal_log`
+
+```sql
+CREATE TABLE meal_log (
+    MealID INT AUTO_INCREMENT PRIMARY KEY,
+    ProfileID INT,
+    MealDate DATE,
+    MealType VARCHAR(20),
+    FoodID INT,
+    Quantity DECIMAL(6,2),
+    FOREIGN KEY (ProfileID) REFERENCES user_profile(ProfileID),
+    FOREIGN KEY (FoodID) REFERENCES food_name(FoodID)
+);
 ```
 
-* Shows dropdown of all saved profiles
-* Button to create new profile via `ProfileForm`
-* Proceeds to `Dashboard` on selection
+### 🔍 Auto-Calculated Nutrients
 
-#### 2. Profile Creation
+From the `nutrient_amount` and `nutrient_name` tables, the following are computed per meal:
 
-```java
-ProfileForm.java
-```
-
-* Enter name, DOB, height, weight, units
-* On save → data is inserted into MySQL
-* Redirects to `Dashboard`
-
-#### 3. Profile Editor
-
-```java
-ProfileEditor.java
-```
-
-* Allows editing of DOB, height, and weight
-* Saves changes to MySQL with update query
-* Has "Back to Dashboard" button
-
-#### 4. Dashboard
-
-```java
-Dashboard.java
-```
-
-* Displays interactive cards for features:
-
-  * Edit Profile
-  * Log Meal *(coming soon)*
-  * Visualize Nutrients *(coming soon)*
-  * Food Swaps *(coming soon)*
-
+* Calories
+* Protein
+* Carbohydrates
+* Fat
+* Saturated + Trans Fat
+* Sugars
+* Fiber
+* Sodium, Potassium
+* Calcium, Iron
+* Cholesterol
 
 ---
 
-### 🎬 Launch the App UI
+### 👨‍💼 UI Components
+
+#### 1. `MealLogger.java`
+
+* UI form to log meals with:
+
+  * Date
+  * Meal type
+  * Food search (dropdown)
+  * Quantity (grams/ml)
+
+#### 2. `MealViewer.java`
+
+* Shows logged meals for a user profile
+* Displays meal date, food name, and full nutrient breakdown
+
+---
+
+### 🎮 Launch the App UI
 
 To start the full desktop UI with profile selection:
 
-> 💡 Make sure you’ve already created the `user_profile` table and loaded CNF data using `CNFImporter`.
+> 💡 Make sure you’ve already created the `user_profile` and `meal_log` tables and loaded CNF data using `CNFImporter`.
 
----
-
-#### 🖥️ Option 1: Run from IntelliJ
+#### 💻 Option 1: Run from IntelliJ
 
 1. Open `ProfileSelector.java`
-2. Right-click anywhere in the file → `Run ProfileSelector.main()`
+2. Right-click → `Run ProfileSelector.main()`
 
-This will open the **Splash Screen**, where you can:
-
-* Select an existing profile
-* Create a new profile (via `ProfileForm`)
-* Proceed to the **Dashboard**
-
----
-
-#### 🖥️ Option 2: Run from Terminal
-
-From project root (if you’ve packaged your app):
+#### 💻 Option 2: Run from Terminal
 
 ```bash
 cd target
 java -cp classes org.example.ui.ProfileSelector
 ```
 
-Or use the full `mvn compile exec` setup if needed.
-
 ---
 
-### 🔁 UI Navigation Flow
+### ♻️ UI Navigation Flow
 
 | Screen         | File              | Trigger                      |
 | -------------- | ----------------- | ---------------------------- |
 | Splash screen  | `ProfileSelector` | App launch                   |
 | Create profile | `ProfileForm`     | Click “Create New Profile”   |
 | Dashboard      | `Dashboard`       | After selecting a profile    |
-| Edit profile   | `ProfileEditor`   | From dashboard → Edit button |
+| Edit profile   | `ProfileEditor`   | From dashboard → Edit        |
+| Log Meal       | `MealLogger`      | From dashboard → Log button  |
+| View Meals     | `MealViewer`      | From dashboard → View button |
 
 ---
 
-## 🗂️ File Structure
+## 📂 File Structure
 
 ```
 NutriSci/
 ├── src/
 │   └── main/java/org/example/
 │       ├── dao/
-│       │   └── UserProfileDAO.java
+│       │   ├── UserProfileDAO.java
+│       │   ├── FoodSearchDAO.java
+│       │   └── MealLogDAO.java
 │       ├── model/
-│       │   └── UserProfile.java
+│       │   ├── UserProfile.java
+│       │   └── MealLog.java
 │       ├── ui/
-│       │   ├── BMRWindow.java
 │       │   ├── ProfileForm.java
 │       │   ├── ProfileSelector.java
 │       │   ├── ProfileEditor.java
-│       │   └── Dashboard.java
+│       │   ├── Dashboard.java
+│       │   ├── MealLogger.java
+│       │   ├── MealViewer.java
+│       │   └── BMRWindow.java
 │       ├── CSVLoader.java
 │       ├── CNFImporter.java
 │       └── CNFTestQuery.java
@@ -279,8 +280,7 @@ NutriSci/
 
 ## 🔭 Coming Soon
 
-* 🧾 Meal logging (per date/meal type)
-* 🔁 Smart food swaps (goal-driven replacements)
+* ♻️ Smart food swaps (goal-driven replacements)
 * 📈 Nutrient comparisons (before/after swap)
 * 📊 Charts using JFreeChart
 * 🥗 Canada Food Guide alignment visualization
@@ -299,5 +299,8 @@ NutriSci/
 
 ## 👩‍💻 Contributors
 
+Team Bravo — EECS 3311 Summer 2025
 * Shaf Muhammad
-* Team Bravo — EECS 3311 Summer 2025
+* Abdul Wasay
+* Ariel Lubovich
+* Cyrus Hui
