@@ -11,4 +11,11 @@ public class NutrientChartWindow extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         add(new NutrientChartPanel());
     }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            NutrientChartWindow window = new NutrientChartWindow();
+            window.setVisible(true);
+        });
+    }
 }
