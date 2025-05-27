@@ -58,7 +58,7 @@ CREATE DATABASE nutriscidb;
 
 ---
 
-### 🚱 3. Load CNF Table Schema
+### ⚙️ 3. Load CNF Table Schema
 
 Run this in terminal:
 
