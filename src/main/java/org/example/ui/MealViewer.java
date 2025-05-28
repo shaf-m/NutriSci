@@ -5,65 +5,119 @@ import org.example.model.MealLog;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MealViewer extends JFrame {
+    private JPanel cardContainer;
+
     public MealViewer(int profileId) {
-        setTitle("Meal Log");
-        setSize(700, 500);
+        setTitle("🍽️ Meal Log Viewer");
+        setSize(750, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        JTextArea area = new JTextArea();
-        area.setEditable(false);
-        area.setFont(new Font("Monospaced", Font.PLAIN, 13));
-        JScrollPane scrollPane = new JScrollPane(area);
+        // Fetch meals
+        List<MealLog> allMeals = MealLogDAO.getMealsByProfile(profileId);
 
-        List<MealLog> meals = MealLogDAO.getMealsByProfile(profileId);
-        if (meals.isEmpty()) {
-            area.setText("No meals logged.");
+        // Extract unique dates
+        Set<String> uniqueDates = allMeals.stream()
+                .map(meal -> meal.getMealDate().toString())
+                .collect(Collectors.toCollection(TreeSet::new)); // ordered set
+
+        JComboBox<String> dateSelector = new JComboBox<>(uniqueDates.toArray(new String[0]));
+        dateSelector.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        dateSelector.setPreferredSize(new Dimension(200, 30));
+        dateSelector.addActionListener(e -> {
+            String selectedDate = (String) dateSelector.getSelectedItem();
+            displayMealsForDate(selectedDate, allMeals);
+        });
+
+        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+        topBar.add(new JLabel("Select Date:"));
+        topBar.add(dateSelector);
+
+        cardContainer = new JPanel();
+        cardContainer.setLayout(new BoxLayout(cardContainer, BoxLayout.Y_AXIS));
+        cardContainer.setBackground(Color.WHITE);
+
+        JScrollPane scrollPane = new JScrollPane(cardContainer);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        add(topBar, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+
+        // Show meals for the first date by default
+        if (!uniqueDates.isEmpty()) {
+            displayMealsForDate(uniqueDates.iterator().next(), allMeals);
         } else {
-            StringBuilder sb = new StringBuilder();
-            for (MealLog meal : meals) {
-                sb.append(String.format("""
-                    📅 %s | 🍽 %s | 🍎 %s (ID: %d) | Qty: %.2fg
-                    - Calories:     %.2f kcal
-                    - Protein:      %.2f g
-                    - Carbs:        %.2f g
-                    - Fat:          %.2f g
-                    - Saturated Fat:%.2f g
-                    - Trans Fat:    %.2f g
-                    - Sugars:       %.2f g
-                    - Fiber:        %.2f g
-                    - Cholesterol:  %.2f mg
-                    - Sodium:       %.2f mg
-                    - Potassium:    %.2f mg
-                    - Calcium:      %.2f mg
-                    - Iron:         %.2f mg
-                    
+            JLabel emptyLabel = new JLabel("No meals logged yet.");
+            emptyLabel.setFont(new Font("SansSerif", Font.ITALIC, 16));
+            emptyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            cardContainer.add(emptyLabel);
+        }
+    }
+
+    private void displayMealsForDate(String date, List<MealLog> allMeals) {
+        cardContainer.removeAll();
+
+        List<MealLog> filtered = allMeals.stream()
+                .filter(m -> m.getMealDate().toString().equals(date))
+                .toList();
+
+        for (MealLog meal : filtered) {
+            JPanel card = new JPanel();
+            card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+            card.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                    BorderFactory.createLineBorder(Color.LIGHT_GRAY)
+            ));
+            card.setBackground(new Color(250, 250, 250));
+
+            JLabel title = new JLabel(String.format("🍽 %s | 🍎 %s (ID: %d)",
+                    meal.getMealType(), meal.getFoodName(), meal.getFoodId()), SwingConstants.CENTER);
+            title.setFont(new Font("SansSerif", Font.BOLD, 14));
+            title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JTextArea details = new JTextArea(String.format("""
+                    Qty: %.2fg
+                    Calories: %.2f kcal | Protein: %.2f g | Carbs: %.2f g | Fat: %.2f g
+                    Sat Fat: %.2f g | Trans Fat: %.2f g | Sugars: %.2f g | Fiber: %.2f g
+                    Cholesterol: %.2f mg | Sodium: %.2f mg | Potassium: %.2f mg
+                    Calcium: %.2f mg | Iron: %.2f mg
                     """,
-                        meal.getMealDate(),
-                        meal.getMealType(),
-                        meal.getFoodName(), meal.getFoodId(),
-                        meal.getQuantity(),
-                        meal.getCalories(),
-                        meal.getProtein(),
-                        meal.getCarbohydrates(),
-                        meal.getFat(),
-                        meal.getSaturatedFat(),
-                        meal.getTransFat(),
-                        meal.getSugars(),
-                        meal.getFiber(),
-                        meal.getCholesterol(),
-                        meal.getSodium(),
-                        meal.getPotassium(),
-                        meal.getCalcium(),
-                        meal.getIron()
-                ));
-            }
-            area.setText(sb.toString());
+                    meal.getQuantity(),
+                    meal.getCalories(),
+                    meal.getProtein(),
+                    meal.getCarbohydrates(),
+                    meal.getFat(),
+                    meal.getSaturatedFat(),
+                    meal.getTransFat(),
+                    meal.getSugars(),
+                    meal.getFiber(),
+                    meal.getCholesterol(),
+                    meal.getSodium(),
+                    meal.getPotassium(),
+                    meal.getCalcium(),
+                    meal.getIron()
+            ));
+            details.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            details.setEditable(false);
+            details.setOpaque(false);
+            details.setBorder(null);
+
+            card.add(title);
+            card.add(Box.createVerticalStrut(5));
+            card.add(details);
+            cardContainer.add(card);
+            cardContainer.add(Box.createVerticalStrut(10));
         }
 
-        add(scrollPane);
+        cardContainer.revalidate();
+        cardContainer.repaint();
     }
 }
