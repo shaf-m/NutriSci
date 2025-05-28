@@ -8,7 +8,7 @@ NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL
 
 ## ✅ Features
 
-* 🔐 Login & signup system with hashed credentials (or plain for dev testing)
+* 🔐 Login & signup system with hashed credentials (currently not hashed for dev testing)
 * 👤 Create and manage user nutrition profiles with authentication
 * 📊 Load the **CNF 2015 dataset** (13 CSVs) into MySQL automatically
 * 🔍 Query real food nutrients and log meals with nutrient summaries
