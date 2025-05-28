@@ -15,6 +15,7 @@ NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL
 * 🧑 Splash screen to select or create a user profile (discontinued)
 * ✏️ Edit profile attributes (height, weight, DOB, units)
 * 🍽️ Log daily meals and view calories, protein, fat, etc.
+* 🏋🏽‍♂️ Log daily exercises and view all your details.
 * 📜 Meal history viewer with full nutrition breakdowns
 
 ---
@@ -157,6 +158,26 @@ CREATE TABLE meal_log (
 
 ---
 
+## 🏋🏽‍♂️ Exercise Logging
+
+Users can log workouts and view them later on in the exercise log viewer.
+
+### 📋 SQL Table: `exercise_log`
+
+```sql
+CREATE TABLE exercise_log (
+    ExerciseID INT AUTO_INCREMENT PRIMARY KEY,
+    ProfileID INT,
+    ExerciseDate DATE,
+    ExerciseType VARCHAR(100),
+    DurationMinutes INT,
+    CaloriesBurned DECIMAL(6,2),
+    FOREIGN KEY (ProfileID) REFERENCES user_profile(ProfileID)
+);
+```
+
+---
+
 ### 👨‍💼 UI Components
 
 | Screen         | File                  | Description                          |
@@ -168,6 +189,8 @@ CREATE TABLE meal_log (
 | Edit profile   | `ProfileEditor`       | Update user info                     |
 | Log Meal       | `MealLogger`          | Add a meal with food + quantity      |
 | View Meals     | `MealViewer`          | Table of all meals logged            |
+| Log Exercises  | `ExerciseLogger`      | Add all exercise details             |
+| View Exercises | `ExerciseViewer`      | Table of all exercises logged        |
 | View BMR       | `BMRWindow`           | Calculate Basal Metabolic Rate       |
 | View Macros    | `NutrientChartWindow` | Macronutrient distribution pie chart |
 
@@ -182,10 +205,12 @@ NutriSci/
 │       ├── dao/
 │       │   ├── UserProfileDAO.java
 │       │   ├── FoodSearchDAO.java
-│       │   └── MealLogDAO.java
+│       │   ├── MealLogDAO.java
+│       │   └── ExerciseLogDAO.java
 │       ├── model/
 │       │   ├── UserProfile.java
-│       │   └── MealLog.java
+│       │   ├── MealLog.java
+│       │   └── ExerciseLog.java
 │       ├── ui/
 │       │   ├── LoginPage.java
 │       │   ├── ProfileForm.java
@@ -193,6 +218,8 @@ NutriSci/
 │       │   ├── ProfileEditor.java
 │       │   ├── Dashboard.java
 │       │   ├── MealLogger.java
+│       │   ├── ExerciseViewer.java
+│       │   ├── ExerciseLogger.java
 │       │   ├── MealViewer.java
 │       │   ├── NutrientChartPanel.java
 │       │   ├── NutrientChartWindow.java
@@ -212,7 +239,7 @@ NutriSci/
 
 * ♻️ Smart food swaps (goal-driven replacements)
 * 📈 Nutrient comparisons (before/after swap)
-* 📊 Charts using JFreeChart
+* 📊 More Charts using JFreeChart
 * 🥗 Canada Food Guide alignment visualization
 
 ---
