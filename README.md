@@ -2,16 +2,17 @@
 
 By Team Bravo | EECS 3311 — Summer 2025
 
-NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL, and CNF 2015 data. It allows users to create personalized profiles, log meals, analyze nutrient intake (like calories, carbs, iron, etc.), and visualize meal information — with support for smart food swaps and charts coming soon.
+NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL, and CNF 2015 data. It allows users to create personalized profiles, log meals, analyze nutrient intake (like calories, carbs, iron, etc.), and visualize meal information — with support for smart food swaps, charts, and login/authentication added in this release.
 
 ---
 
 ## ✅ Features
 
+* 🔐 Login & signup system with hashed credentials (or plain for dev testing)
+* 👤 Create and manage user nutrition profiles
 * 📊 Load the **CNF 2015 dataset** (13 CSVs) into MySQL automatically
 * 🔍 Query real food nutrients and log meals with nutrient summaries
-* 👤 Create and manage **user nutrition profiles**
-* 🧑 Splash screen to select an existing user or create a new one
+* 🧑 Splash screen to select or create a user profile (discontinued)
 * ✏️ Edit profile attributes (height, weight, DOB, units)
 * 🍽️ Log daily meals and view calories, protein, fat, etc.
 * 📜 Meal history viewer with full nutrition breakdowns
@@ -39,7 +40,7 @@ git clone https://github.com/YOUR_USERNAME/NutriSci.git
 cd NutriSci
 ```
 
-> Make sure `NutriSci/` is your IntelliJ project root (not nested inside another `NutriSci/` folder).
+> Ensure `NutriSci/` is your IntelliJ project root (not nested inside another `NutriSci/` folder).
 
 ---
 
@@ -60,13 +61,9 @@ CREATE DATABASE nutriscidb;
 
 ### ⚙️ 3. Load CNF Table Schema
 
-Run this in terminal:
-
 ```bash
 mysql -u root nutriscidb < create_cnf_tables_ordered.sql
 ```
-
-This creates all 13 CNF tables with foreign keys in dependency order.
 
 ---
 
@@ -102,45 +99,23 @@ In IntelliJ, run:
 CNFImporter.java
 ```
 
-This loads all CSVs into MySQL using `OpenCSV`, skipping duplicates and malformed rows with error handling.
-
 ---
 
 ### 🔍 6. Test Queries (Optional)
-
-To confirm data loaded properly, run:
 
 ```java
 CNFTestQuery.java
 ```
 
-Example expected output:
-
-```
-✅ Sample food_name rows:
- - 2: Cheese souffle
-...
-
-🔍 Nutrients for 'apple':
- - CARBOHYDRATE, TOTAL: 11.43 g
- - SUGARS: 9.23 g
-...
-```
-
 ---
 
-## 👤 User Profile System
+## 👤 User Profile & Authentication System
 
-Users can create, select, and update personal nutrition profiles. Each user profile contains:
+### 👥 Login & Signup
 
-* Name
-* Sex (`Male`, `Female`, `Other`)
-* Date of birth
-* Height (cm)
-* Weight (kg)
-* Units (`Metric` or `Imperial`)
-
----
+* Users can register with a unique username and password
+* Passwords can be stored as SHA-256 hashed or plain (for testing)
+* After signup → user completes their profile → redirected to dashboard
 
 ### 📟 SQL Table: `user_profile`
 
@@ -148,6 +123,8 @@ Users can create, select, and update personal nutrition profiles. Each user prof
 CREATE TABLE IF NOT EXISTS user_profile (
     ProfileID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
+    Username VARCHAR(50) UNIQUE NOT NULL,
+    PasswordHash VARCHAR(255) NOT NULL,
     Sex ENUM('Male', 'Female', 'Other') NOT NULL,
     DateOfBirth DATE NOT NULL,
     Height_cm DECIMAL(5,2) NOT NULL,
@@ -161,7 +138,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
 
 ## 🍽️ Meal Logging
 
-Users can log meals (breakfast, lunch, dinner, snacks) and specify food items and quantities. The app automatically calculates nutrients using CNF data.
+Users can log meals (breakfast, lunch, dinner, snacks) and specify food items and quantities. Nutrients are auto-calculated.
 
 ### 📋 SQL Table: `meal_log`
 
@@ -178,73 +155,21 @@ CREATE TABLE meal_log (
 );
 ```
 
-### 🔍 Auto-Calculated Nutrients
-
-From the `nutrient_amount` and `nutrient_name` tables, the following are computed per meal:
-
-* Calories
-* Protein
-* Carbohydrates
-* Fat
-* Saturated + Trans Fat
-* Sugars
-* Fiber
-* Sodium, Potassium
-* Calcium, Iron
-* Cholesterol
-
 ---
 
 ### 👨‍💼 UI Components
 
-#### 1. `MealLogger.java`
-
-* UI form to log meals with:
-
-  * Date
-  * Meal type
-  * Food search (dropdown)
-  * Quantity (grams/ml)
-
-#### 2. `MealViewer.java`
-
-* Shows logged meals for a user profile
-* Displays meal date, food name, and full nutrient breakdown
-
----
-
-### 🎮 Launch the App UI
-
-To start the full desktop UI with profile selection:
-
-> 💡 Make sure you’ve already created the `user_profile` and `meal_log` tables and loaded CNF data using `CNFImporter`.
-
-#### 💻 Option 1: Run from IntelliJ
-
-1. Open `ProfileSelector.java`
-2. Right-click → `Run ProfileSelector.main()`
-
-#### 💻 Option 2: Run from Terminal
-
-```bash
-cd target
-java -cp classes org.example.ui.ProfileSelector
-```
-
----
-
-### ♻️ UI Navigation Flow
-
-| Screen         | File                   | Trigger                      |
-| -------------- | -----------------      | ---------------------------- |
-| Splash screen  | `ProfileSelector`      | App launch                   |
-| Create profile | `ProfileForm`          | Click “Create New Profile”   |
-| Dashboard      | `Dashboard`            | After selecting a profile    |
-| Edit profile   | `ProfileEditor`        | From dashboard → Edit        |
-| Log Meal       | `MealLogger`           | From dashboard → Log button  |
-| View Meals     | `MealViewer`           | From dashboard               |
-| View BMR       | `BMRWindow`            | From dashboard               |
-| View Macros    | `NutrientChartWindow`  | From dashboard               |
+| Screen         | File                  | Description                          |
+| -------------- | --------------------- | ------------------------------------ |
+| Login          | `LoginPage.java`      | Tabbed login/signup screen           |
+| Splash screen  | `ProfileSelector`     | Choose or create profile             |
+| Create profile | `ProfileForm`         | Input user attributes                |
+| Dashboard      | `Dashboard`           | Core menu with navigation cards      |
+| Edit profile   | `ProfileEditor`       | Update user info                     |
+| Log Meal       | `MealLogger`          | Add a meal with food + quantity      |
+| View Meals     | `MealViewer`          | Table of all meals logged            |
+| View BMR       | `BMRWindow`           | Calculate Basal Metabolic Rate       |
+| View Macros    | `NutrientChartWindow` | Macronutrient distribution pie chart |
 
 ---
 
@@ -262,6 +187,7 @@ NutriSci/
 │       │   ├── UserProfile.java
 │       │   └── MealLog.java
 │       ├── ui/
+│       │   ├── LoginPage.java
 │       │   ├── ProfileForm.java
 │       │   ├── ProfileSelector.java
 │       │   ├── ProfileEditor.java
@@ -304,6 +230,7 @@ NutriSci/
 ## 👩‍💻 Contributors
 
 Team Bravo — EECS 3311 Summer 2025
+
 * Shaf Muhammad
 * Abdul Wasay
 * Ariel Lubovich
