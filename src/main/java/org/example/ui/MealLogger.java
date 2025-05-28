@@ -6,6 +6,7 @@ import org.example.dao.MealLogDAO;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,22 +16,26 @@ public class MealLogger extends JFrame {
     public MealLogger(int profileId) {
         this.profileId = profileId;
         setTitle("Log a Meal");
-        setSize(450, 350);
+        setSize(500, 380);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        JPanel panel = new JPanel(new GridLayout(7, 2, 10, 10));
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
 
-        JTextField dateField = new JTextField("YYYY-MM-DD");
+        JTextField dateField = new JTextField(LocalDate.now().toString());
         JComboBox<String> mealBox = new JComboBox<>(new String[]{"Breakfast", "Lunch", "Dinner", "Snack"});
-
         JTextField searchField = new JTextField();
+        searchField.setPreferredSize(new Dimension(250, 30));
+        JButton searchButton = new JButton("🔍");
         JComboBox<String> resultsBox = new JComboBox<>();
         JTextField qtyField = new JTextField();
-
         JLabel status = new JLabel();
-        JButton searchButton = new JButton("Search Food");
         JButton saveButton = new JButton("Log Meal");
 
         Map<String, Integer> foodMap = new HashMap<>();
@@ -47,14 +52,54 @@ public class MealLogger extends JFrame {
             }
         });
 
-        // Form layout
-        panel.add(new JLabel("Date:")); panel.add(dateField);
-        panel.add(new JLabel("Meal Type:")); panel.add(mealBox);
-        panel.add(new JLabel("Search Food:")); panel.add(searchField);
-        panel.add(new JLabel("Select Result:")); panel.add(resultsBox);
-        panel.add(new JLabel("Quantity (g/ml):")); panel.add(qtyField);
-        panel.add(searchButton); panel.add(saveButton);
-        panel.add(new JLabel()); panel.add(status);
+        // Row 1: Date
+        panel.add(new JLabel("Date:"), gbc);
+        gbc.gridx = 1;
+        panel.add(dateField, gbc);
+
+        // Row 2: Meal Type
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Meal Type:"), gbc);
+        gbc.gridx = 1;
+        panel.add(mealBox, gbc);
+
+        // Row 3: Search Food + Icon
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Search Food:"), gbc);
+        gbc.gridx = 1;
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(searchButton, BorderLayout.EAST);
+        panel.add(searchPanel, gbc);
+
+        // Row 4: Search Result Dropdown
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Select Result:"), gbc);
+        gbc.gridx = 1;
+        panel.add(resultsBox, gbc);
+
+        // Row 5: Quantity
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Quantity (g/ml):"), gbc);
+        gbc.gridx = 1;
+        panel.add(qtyField, gbc);
+
+        // Row 6: Save Button
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        saveButton.setBackground(new Color(46, 204, 113));
+        saveButton.setForeground(Color.black);
+        saveButton.setFocusPainted(false);
+        panel.add(saveButton, gbc);
+
+        // Row 7: Status
+        gbc.gridy++;
+        panel.add(status, gbc);
 
         saveButton.addActionListener(e -> {
             try {
