@@ -32,7 +32,7 @@ class ProfileSelector extends JFrame {
         add(panel);
 
         createButton.addActionListener(e -> {
-            new ProfileForm(true).setVisible(true); // ← tells ProfileForm to return to dashboard
+            new ProfileForm().setVisible(true);
             dispose();
         });
 

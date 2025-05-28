@@ -1,38 +1,34 @@
 package org.example.ui;
 
-import org.example.model.UserProfile;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.*;
 
 public class ProfileForm extends JFrame {
-    private JTextField nameField;
-    private JComboBox<String> sexBox;
-    private JTextField dobField;
-    private JTextField heightField;
-    private JTextField weightField;
-    private JComboBox<String> unitBox;
+    private JTextField nameField, dobField, heightField, weightField;
+    private JComboBox<String> sexBox, unitBox;
     private JLabel statusLabel;
-    private boolean launchedFromSplash = false;
+    private boolean launchedFromLogin = false;
+    private String username;
 
     public ProfileForm() {
-        this(false); // default constructor
+        this(false, null);
     }
 
-    public ProfileForm(boolean fromSplash) {
-        this.launchedFromSplash = fromSplash;
+    public ProfileForm(boolean fromLogin, String username) {
+        this.launchedFromLogin = fromLogin;
+        this.username = username;
 
         setTitle("Create Profile");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 400);
+        setSize(420, 420);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(9, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(10, 2, 10, 10)); // updated layout
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        nameField = new JTextField();
+        nameField = new JTextField(username != null ? username : "");
         sexBox = new JComboBox<>(new String[]{"Male", "Female", "Other"});
         dobField = new JTextField("YYYY-MM-DD");
         heightField = new JTextField();
@@ -54,7 +50,9 @@ public class ProfileForm extends JFrame {
 
         saveButton.addActionListener(this::handleSave);
         backButton.addActionListener(e -> {
-            if (launchedFromSplash) {
+            if (launchedFromLogin) {
+                new LoginPage().setVisible(true);
+            } else {
                 new ProfileSelector().setVisible(true);
             }
             dispose();
@@ -65,49 +63,59 @@ public class ProfileForm extends JFrame {
 
     private void handleSave(ActionEvent e) {
         try {
-            String name = nameField.getText();
+            String name = nameField.getText().trim();
             String sex = (String) sexBox.getSelectedItem();
-            Date dob = Date.valueOf(dobField.getText().trim());
-            double height = Double.parseDouble(heightField.getText().trim());
-            double weight = Double.parseDouble(weightField.getText().trim());
+            String dobText = dobField.getText().trim();
+            String heightText = heightField.getText().trim();
+            String weightText = weightField.getText().trim();
             String units = (String) unitBox.getSelectedItem();
 
-            UserProfile profile = new UserProfile(name, sex, dob, height, weight, units);
+            if (name.isEmpty() || dobText.isEmpty() || heightText.isEmpty() || weightText.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all fields before saving.");
+                return;
+            }
 
-            Connection conn = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+            Date dob = Date.valueOf(dobText);
+            double height = Double.parseDouble(heightText);
+            double weight = Double.parseDouble(weightText);
+
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
             PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO user_profile (Name, Sex, DateOfBirth, Height_cm, Weight_kg, Units) " +
-                            "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    "UPDATE user_profile SET Name=?, Sex=?, DateOfBirth=?, Height_cm=?, Weight_kg=?, Units=? " +
+                            "WHERE Username=?", Statement.RETURN_GENERATED_KEYS);
 
-            stmt.setString(1, profile.getName());
-            stmt.setString(2, profile.getSex());
-            stmt.setDate(3, profile.getDateOfBirth());
-            stmt.setDouble(4, profile.getHeightCm());
-            stmt.setDouble(5, profile.getWeightKg());
-            stmt.setString(6, profile.getUnits());
+            stmt.setString(1, name);
+            stmt.setString(2, sex);
+            stmt.setDate(3, dob);
+            stmt.setDouble(4, height);
+            stmt.setDouble(5, weight);
+            stmt.setString(6, units);
+            stmt.setString(7, username);
 
             int rows = stmt.executeUpdate();
-
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                int newProfileId = rs.getInt(1);
-                statusLabel.setText("✅ Saved. Redirecting...");
-                stmt.close(); conn.close();
-                if (launchedFromSplash) {
-                    new Dashboard(newProfileId).setVisible(true);
+            if (rows > 0) {
+                PreparedStatement fetch = conn.prepareStatement(
+                        "SELECT ProfileID FROM user_profile WHERE Username = ?");
+                fetch.setString(1, username);
+                ResultSet rs = fetch.executeQuery();
+                if (rs.next()) {
+                    int id = rs.getInt("ProfileID");
+                    statusLabel.setText("✅ Profile saved.");
+                    conn.close();
+                    new Dashboard(id).setVisible(true);
+                    dispose();
                 }
-                dispose();
             } else {
-                statusLabel.setText("❌ Saved but no ID returned.");
+                statusLabel.setText("❌ Failed to update profile.");
             }
+
         } catch (Exception ex) {
             ex.printStackTrace();
-            statusLabel.setText("❌ Failed to save");
+            JOptionPane.showMessageDialog(this, "❌ Invalid input or database error.");
         }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ProfileForm(true).setVisible(true));
+        SwingUtilities.invokeLater(() -> new ProfileForm(true, "testuser").setVisible(true));
     }
 }

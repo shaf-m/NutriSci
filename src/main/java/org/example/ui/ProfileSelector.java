@@ -19,10 +19,20 @@ class Dashboard extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         UserProfile profile = UserProfileDAO.getById(profileId);
-        String userName = profile != null ? profile.getName() : "User";
+//        System.out.println("Fetched UserProfile: " + (profile != null ? profile.getName() : "null"));
 
-        // Top welcome label
-        JLabel welcomeLabel = new JLabel("👋 Welcome back, " + userName + "!");
+        String userName;
+        if (profile != null && profile.getName() != null && !profile.getName().trim().isEmpty()) {
+            userName = profile.getName();
+//            System.out.println("Using Name from profile: " + userName);
+        } else {
+            userName = UserProfileDAO.getUsernameById(profileId);
+//            System.out.println("Fallback to Username: " + userName);
+        }
+
+// Top welcome label
+        JLabel welcomeLabel = new JLabel("Welcome back, " + userName + "!");
+//        System.out.println("Final Welcome Label Text: 👋 Welcome back, " + userName + "!");
         welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         welcomeLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
