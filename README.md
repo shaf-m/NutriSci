@@ -27,7 +27,7 @@ NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL
 | Tool           | Version              | Notes                  |
 | -------------- | -------------------- | ---------------------- |
 | JDK            | `OpenJDK 23.0.2`     | Installed via Homebrew |
-| IntelliJ IDEA  | CE (2024.1+)         | Maven support included |
+| IntelliJ IDEA  | Ultimate (2024.1+)   | Maven support included |
 | MySQL          | `brew install mysql` | Version 8+ preferred   |
 | GitHub Desktop | Optional             | For repo sync          |
 
