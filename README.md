@@ -60,6 +60,10 @@ CREATE DATABASE nutriscidb;
 
 ---
 
+[![View NutriSciDB Schema on dbdiagram.io](https://img.shields.io/badge/View%20DBML%20Schema-dbdiagram.io-blue?logo=datagrip&style=for-the-badge)](https://dbdiagram.io/e/6838f8adbd74709cb72f1b05/6838f8bfbd74709cb72f1d2b)
+
+---
+
 ### ⚙️ 3. Load CNF Table Schema
 
 ```bash
