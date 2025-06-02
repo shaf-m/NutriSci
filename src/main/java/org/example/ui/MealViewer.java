@@ -9,6 +9,12 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.DefaultPieDataset;
+
+
 public class MealViewer extends JFrame {
     private JPanel cardContainer;
 
@@ -84,12 +90,12 @@ public class MealViewer extends JFrame {
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JTextArea details = new JTextArea(String.format("""
-                    Qty: %.2fg
-                    Calories: %.2f kcal | Protein: %.2f g | Carbs: %.2f g | Fat: %.2f g
-                    Sat Fat: %.2f g | Trans Fat: %.2f g | Sugars: %.2f g | Fiber: %.2f g
-                    Cholesterol: %.2f mg | Sodium: %.2f mg | Potassium: %.2f mg
-                    Calcium: %.2f mg | Iron: %.2f mg
-                    """,
+            Qty: %.2fg
+            Calories: %.2f kcal | Protein: %.2f g | Carbs: %.2f g | Fat: %.2f g
+            Sat Fat: %.2f g | Trans Fat: %.2f g | Sugars: %.2f g | Fiber: %.2f g
+            Cholesterol: %.2f mg | Sodium: %.2f mg | Potassium: %.2f mg
+            Calcium: %.2f mg | Iron: %.2f mg
+            """,
                     meal.getQuantity(),
                     meal.getCalories(),
                     meal.getProtein(),
@@ -110,9 +116,26 @@ public class MealViewer extends JFrame {
             details.setOpaque(false);
             details.setBorder(null);
 
+            JButton viewChartBtn = new JButton("📊 View Nutrient Breakdown");
+            viewChartBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // Nutrient chart panel (initially hidden)
+            ChartPanel chartPanel = new ChartPanel(createNutrientPieChart(meal));
+            chartPanel.setPreferredSize(new Dimension(400, 300));
+            chartPanel.setVisible(false);
+
+            viewChartBtn.addActionListener(e -> {
+                boolean currentlyVisible = chartPanel.isVisible();
+                chartPanel.setVisible(!currentlyVisible);
+                viewChartBtn.setText(currentlyVisible ? "📊 View Nutrient Breakdown" : "❌ Close Chart");
+            });
+
             card.add(title);
             card.add(Box.createVerticalStrut(5));
             card.add(details);
+            card.add(viewChartBtn);
+            card.add(chartPanel);
+            card.add(Box.createVerticalStrut(10));
             cardContainer.add(card);
             cardContainer.add(Box.createVerticalStrut(10));
         }
@@ -120,4 +143,25 @@ public class MealViewer extends JFrame {
         cardContainer.revalidate();
         cardContainer.repaint();
     }
+
+    private JFreeChart createNutrientPieChart(MealLog meal) {
+        double protein = meal.getProtein();
+        double carbs = meal.getCarbohydrates();
+        double fat = meal.getFat();
+
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        if (protein + carbs + fat > 0) {
+            dataset.setValue("Protein", protein);
+            dataset.setValue("Carbohydrates", carbs);
+            dataset.setValue("Fat", fat);
+        } else {
+            dataset.setValue("No Data", 1); // show empty fallback for now idk
+        }
+
+        return ChartFactory.createPieChart(
+                "Macronutrient Composition (g)", dataset, true, true, false
+        );
+    }
+
+
 }
