@@ -158,9 +158,15 @@ public class MealViewer extends JFrame {
             dataset.setValue("No Data", 1); // show empty fallback for now idk
         }
 
-        return ChartFactory.createPieChart(
+        JFreeChart chart = ChartFactory.createPieChart(
                 "Macronutrient Composition (g)", dataset, true, true, false
         );
+
+        // Set white background
+        chart.setBackgroundPaint(Color.WHITE);
+        chart.getPlot().setBackgroundPaint(Color.WHITE);
+
+        return chart;
     }
 
 
