@@ -32,7 +32,7 @@ public class ExerciseLogger extends JFrame {
             try {
                 ExerciseLog log = new ExerciseLog();
                 log.setProfileId(profileId);
-                log.setExerciseDate(java.sql.Date.valueOf(dateField.getText()));
+                log.setLogDate(java.sql.Date.valueOf(dateField.getText()));
                 log.setExerciseType(typeField.getText());
                 log.setDurationMinutes(Integer.parseInt(durationField.getText()));
                 log.setCaloriesBurned(Double.parseDouble(caloriesField.getText()));

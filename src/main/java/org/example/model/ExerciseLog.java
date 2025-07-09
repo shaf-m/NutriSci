@@ -2,10 +2,8 @@ package org.example.model;
 
 import java.util.Date;
 
-public class ExerciseLog {
+public class ExerciseLog extends HealthLog {
     private int exerciseId;
-    private int profileId;
-    private Date exerciseDate;
     private String exerciseType;
     private int durationMinutes;
     private double caloriesBurned;
@@ -16,22 +14,6 @@ public class ExerciseLog {
 
     public void setExerciseId(int exerciseId) {
         this.exerciseId = exerciseId;
-    }
-
-    public int getProfileId() {
-        return profileId;
-    }
-
-    public void setProfileId(int profileId) {
-        this.profileId = profileId;
-    }
-
-    public Date getExerciseDate() {
-        return exerciseDate;
-    }
-
-    public void setExerciseDate(Date exerciseDate) {
-        this.exerciseDate = exerciseDate;
     }
 
     public String getExerciseType() {
@@ -57,6 +39,12 @@ public class ExerciseLog {
     public void setCaloriesBurned(double caloriesBurned) {
         this.caloriesBurned = caloriesBurned;
     }
-// Getters and setters
-    // ...
+
+    @Override
+    protected void displaySpecificDetails() {
+        System.out.println("Exercise ID: " + exerciseId);
+        System.out.println("Exercise Type: " + exerciseType);
+        System.out.println("Duration (minutes): " + durationMinutes);
+        System.out.println("Calories Burned: " + caloriesBurned);
+    }
 }

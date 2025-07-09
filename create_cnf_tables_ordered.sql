@@ -19,7 +19,7 @@ CREATE TABLE nutrient_name (
     NutrientNameID INT PRIMARY KEY,
     NutrientCode INT,
     NutrientSymbol VARCHAR(10),
-    Unit VARCHAR(8),
+    Unit VARCHAR(8), --NutrientUnit
     NutrientName VARCHAR(200),
     NutrientNameF VARCHAR(200),
     Tagname VARCHAR(20),
@@ -37,22 +37,22 @@ CREATE TABLE nutrient_source (
 
 CREATE TABLE measure_name (
     MeasureID INT PRIMARY KEY,
-    MeasureName VARCHAR(200),
-    MeasureNameF VARCHAR(200)
+    MeasureName VARCHAR(200), --MeasureDescription
+    MeasureNameF VARCHAR(200) --MeasureDescriptionF
 );
 
 
 CREATE TABLE refuse_name (
     RefuseID INT PRIMARY KEY,
-    RefuseName VARCHAR(200),
-    RefuseNameF VARCHAR(200)
+    RefuseName VARCHAR(200),--RefuseDescription
+    RefuseNameF VARCHAR(200) --RefuseDescriptionF
 );
 
 
 CREATE TABLE yield_name (
     YieldID INT PRIMARY KEY,
-    YieldName VARCHAR(200),
-    YieldNameF VARCHAR(200)
+    YieldName VARCHAR(200), --YieldDescription
+    YieldNameF VARCHAR(200) --YieldDescriptionF
 );
 
 

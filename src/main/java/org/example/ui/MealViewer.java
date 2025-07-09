@@ -30,7 +30,7 @@ public class MealViewer extends JFrame {
 
         // Extract unique dates
         Set<String> uniqueDates = allMeals.stream()
-                .map(meal -> meal.getMealDate().toString())
+                .map(meal -> meal.getLogDate().toString())
                 .collect(Collectors.toCollection(TreeSet::new)); // ordered set
 
         JComboBox<String> dateSelector = new JComboBox<>(uniqueDates.toArray(new String[0]));
@@ -72,7 +72,7 @@ public class MealViewer extends JFrame {
         cardContainer.removeAll();
 
         List<MealLog> filtered = allMeals.stream()
-                .filter(m -> m.getMealDate().toString().equals(date))
+                .filter(m -> m.getLogDate().toString().equals(date))
                 .toList();
 
         for (MealLog meal : filtered) {
