@@ -29,7 +29,7 @@ public class ExerciseViewer extends JFrame {
 
         for (ExerciseLog log : logs) {
             model.addRow(new Object[]{
-                    log.getExerciseDate().toString(),
+                    log.getLogDate().toString(),
                     log.getExerciseType(),
                     log.getDurationMinutes(),
                     String.format("%.1f", log.getCaloriesBurned())

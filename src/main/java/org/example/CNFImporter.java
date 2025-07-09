@@ -9,6 +9,7 @@ import java.math.RoundingMode;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 
+
 public class CNFImporter {
 
     private final Connection connection;
@@ -105,4 +106,6 @@ public class CNFImporter {
             return null;
         }
     }
+
+
 }

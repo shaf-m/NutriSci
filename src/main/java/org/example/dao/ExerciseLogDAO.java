@@ -13,7 +13,7 @@ public class ExerciseLogDAO {
         String sql = "INSERT INTO exercise_log (ProfileID, ExerciseDate, ExerciseType, DurationMinutes, CaloriesBurned) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setInt(1, log.getProfileId());
-        stmt.setDate(2, new java.sql.Date(log.getExerciseDate().getTime()));
+        stmt.setDate(2, new java.sql.Date(log.getLogDate().getTime()));
         stmt.setString(3, log.getExerciseType());
         stmt.setInt(4, log.getDurationMinutes());
         stmt.setDouble(5, log.getCaloriesBurned());
@@ -32,7 +32,7 @@ public class ExerciseLogDAO {
             ExerciseLog log = new ExerciseLog();
             log.setExerciseId(rs.getInt("ExerciseID"));
             log.setProfileId(rs.getInt("ProfileID"));
-            log.setExerciseDate(rs.getDate("ExerciseDate"));
+            log.setLogDate(rs.getDate("ExerciseDate"));
             log.setExerciseType(rs.getString("ExerciseType"));
             log.setDurationMinutes(rs.getInt("DurationMinutes"));
             log.setCaloriesBurned(rs.getDouble("CaloriesBurned"));

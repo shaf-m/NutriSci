@@ -2,10 +2,8 @@ package org.example.model;
 
 import java.sql.Date;
 
-public class MealLog {
+public class MealLog extends HealthLog {
     private int mealId;
-    private int profileId;
-    private Date mealDate;
     private String mealType;
     private int foodId;
     private String foodName;
@@ -30,8 +28,8 @@ public class MealLog {
     public MealLog() {}
 
     public MealLog(int profileId, Date mealDate, String mealType, int foodId, double quantity) {
-        this.profileId = profileId;
-        this.mealDate = mealDate;
+        this.setProfileId(profileId);
+        this.setLogDate(mealDate);
         this.mealType = mealType;
         this.foodId = foodId;
         this.quantity = quantity;
@@ -39,22 +37,18 @@ public class MealLog {
 
     public MealLog(int mealId, int profileId, Date mealDate, String mealType, int foodId, double quantity) {
         this.mealId = mealId;
-        this.profileId = profileId;
-        this.mealDate = mealDate;
+        this.setProfileId(profileId);
+        this.setLogDate(mealDate);
         this.mealType = mealType;
         this.foodId = foodId;
         this.quantity = quantity;
     }
 
+
+
     // Getters and setters
     public int getMealId() { return mealId; }
     public void setMealId(int mealId) { this.mealId = mealId; }
-
-    public int getProfileId() { return profileId; }
-    public void setProfileId(int profileId) { this.profileId = profileId; }
-
-    public Date getMealDate() { return mealDate; }
-    public void setMealDate(Date mealDate) { this.mealDate = mealDate; }
 
     public String getMealType() { return mealType; }
     public void setMealType(String mealType) { this.mealType = mealType; }
@@ -106,4 +100,16 @@ public class MealLog {
 
     public double getIron() { return iron; }
     public void setIron(double iron) { this.iron = iron; }
+
+    @Override
+    protected void displaySpecificDetails() {
+        System.out.println("Meal ID: " + mealId);
+        System.out.println("Meal Type: " + mealType);
+        System.out.println("Food ID: " + foodId);
+        System.out.println("Food Name: " + foodName);
+        System.out.println("Quantity: " + quantity);
+        System.out.println("Calories: " + calories);
+        System.out.println("Fat: " + fat);
+        System.out.println("Protein: " + protein);
+    }
 }
