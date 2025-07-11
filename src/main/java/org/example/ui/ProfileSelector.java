@@ -56,7 +56,7 @@ class Dashboard extends JFrame {
         container.add(makeCard("<html><div>🏃<br>Log Exercise</div></html>", e -> new ExerciseLogger(profileId).setVisible(true)));
         container.add(makeCard("<html><div>🏋🏽<br>View Exercises</div></html>", e -> new ExerciseViewer(profileId).setVisible(true)));
         container.add(makeCard("<html><div>🔁<br>Suggest Swaps</div></html>", e -> new SuggestSwap(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>🥗<br>Canada Food Guide</div></html>", null));
+        container.add(makeCard("<html><div>🥗<br>Canada Food Guide</div></html>",  e -> new CanadaGuideChart(profileId).setVisible(true)));
 
         // Setup main layout
         getContentPane().setBackground(new Color(210, 255, 232));
