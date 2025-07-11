@@ -23,7 +23,7 @@ public class SuggestSwap extends JFrame {
     public SuggestSwap(int profileId) {
         this.profileId = profileId;
         setTitle("Suggest Swaps");
-        setSize(500, 400);
+        setSize(1000, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -81,7 +81,7 @@ public class SuggestSwap extends JFrame {
             stmt.setInt(1, profileId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                String goal = rs.getString("goal_type") + " " + rs.getString("nutrient") + " by " + rs.getString("goal_amount");
+                String goal = rs.getString("goal_type") + " " + rs.getString("nutrient") + " to " + rs.getString("goal_amount");
                 goalLabel.setText("Your Goal: " + goal + " grams");
             } else {
                 goalLabel.setText("No Goal Found.");
@@ -191,7 +191,7 @@ public class SuggestSwap extends JFrame {
         StringBuilder suggestion = new StringBuilder();
         suggestion.append("Suggesting foods to ").append(goalType.toLowerCase())
                 .append(" ").append(nutrient.toLowerCase())
-                .append(" by ").append(targetAmount).append(" grams.\n\n");
+                .append(" to ").append(targetAmount).append(" grams.\n\n");
 
         suggestion.append("Current meal provides: ")
                 .append(String.format("%.2f", oldMealNutrientTotal))
