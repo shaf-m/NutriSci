@@ -1,5 +1,6 @@
 package org.example.ui;
 
+import org.example.dao.CentralDAO;
 import org.example.dao.FoodSearchDAO;
 import org.example.dao.MealLogDAO;
 
@@ -12,8 +13,10 @@ import java.util.Map;
 
 public class MealLogger extends JFrame {
     private final int profileId;
+    private CentralDAO centralDAO;
 
     public MealLogger(int profileId) {
+        centralDAO = centralDAO.getInstance();
         this.profileId = profileId;
         setTitle("Log a Meal");
         setSize(500, 380);
@@ -43,7 +46,7 @@ public class MealLogger extends JFrame {
         // Search logic
         searchButton.addActionListener(e -> {
             String query = searchField.getText().trim();
-            Map<String, Integer> matches = FoodSearchDAO.searchFoods(query);
+            Map<String, Integer> matches = centralDAO.getFoodSearchDAO().searchFoods(query);
             resultsBox.removeAllItems();
             foodMap.clear();
             for (String name : matches.keySet()) {
@@ -114,7 +117,7 @@ public class MealLogger extends JFrame {
                 int foodId = foodMap.get(selectedFood);
                 double qty = Double.parseDouble(qtyField.getText().trim());
 
-                MealLogDAO.insertMeal(profileId, date, mealType, foodId, qty);
+                centralDAO.getMealLogDAO().insertMeal(profileId, date, mealType, foodId, qty);
                 status.setText("✅ Meal logged!");
             } catch (Exception ex) {
                 ex.printStackTrace();

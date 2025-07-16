@@ -1,7 +1,8 @@
 package org.example.ui;
 
+import org.example.dao.CentralDAO;
 import org.example.dao.ExerciseLogDAO;
-import org.example.model.ExerciseLog;
+import org.example.model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,8 +11,11 @@ import java.util.Date;
 
 public class ExerciseLogger extends JFrame {
     private final int profileId;
+    CentralDAO centralDAO = CentralDAO.getInstance();
+    ExerciseLogFactory logFactory;
 
     public ExerciseLogger(int profileId) {
+        logFactory = new ExerciseLogFactory();
         this.profileId = profileId;
         setTitle("Log Exercise");
         setSize(400, 350);
@@ -28,16 +32,15 @@ public class ExerciseLogger extends JFrame {
         JLabel status = new JLabel();
 
         JButton submitBtn = new JButton("Log Exercise");
+
+        centralDAO = CentralDAO.getInstance();
+
         submitBtn.addActionListener(e -> {
             try {
-                ExerciseLog log = new ExerciseLog();
-                log.setProfileId(profileId);
-                log.setLogDate(java.sql.Date.valueOf(dateField.getText()));
-                log.setExerciseType(typeField.getText());
-                log.setDurationMinutes(Integer.parseInt(durationField.getText()));
-                log.setCaloriesBurned(Double.parseDouble(caloriesField.getText()));
+                ExerciseLog log = logFactory.createLog(profileId, java.sql.Date.valueOf(dateField.getText()), typeField.getText(), Integer.parseInt(durationField.getText()));
+                log.setCalories(Double.parseDouble(caloriesField.getText()));
 
-                ExerciseLogDAO.logExercise(log);
+                centralDAO.getExerciseLogDAO().logExercise(log);
                 status.setText("✅ Exercise logged!");
             } catch (Exception ex) {
                 ex.printStackTrace();

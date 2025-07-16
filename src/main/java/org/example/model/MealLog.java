@@ -2,15 +2,11 @@ package org.example.model;
 
 import java.sql.Date;
 
-public class MealLog extends HealthLog {
-    private int mealId;
-    private String mealType;
+public class MealLog extends HealthLog{
     private int foodId;
     private String foodName;
-    private double quantity;
 
-    // Nutrition fields
-    private double calories;
+    // Nutrition field
     private double fat;
     private double saturatedFat;
     private double transFat;
@@ -25,45 +21,25 @@ public class MealLog extends HealthLog {
     private double iron;
 
     // Constructors
-    public MealLog() {}
+    public MealLog() { super(); }
 
     public MealLog(int profileId, Date mealDate, String mealType, int foodId, double quantity) {
-        this.setProfileId(profileId);
-        this.setLogDate(mealDate);
-        this.mealType = mealType;
+        super(profileId, mealDate, mealType, quantity);
         this.foodId = foodId;
-        this.quantity = quantity;
     }
 
     public MealLog(int mealId, int profileId, Date mealDate, String mealType, int foodId, double quantity) {
-        this.mealId = mealId;
-        this.setProfileId(profileId);
-        this.setLogDate(mealDate);
-        this.mealType = mealType;
+        super(mealId, profileId, mealDate, mealType, quantity);
         this.foodId = foodId;
-        this.quantity = quantity;
     }
 
-
-
     // Getters and setters
-    public int getMealId() { return mealId; }
-    public void setMealId(int mealId) { this.mealId = mealId; }
-
-    public String getMealType() { return mealType; }
-    public void setMealType(String mealType) { this.mealType = mealType; }
 
     public int getFoodId() { return foodId; }
     public void setFoodId(int foodId) { this.foodId = foodId; }
 
     public String getFoodName() { return foodName; }
     public void setFoodName(String foodName) { this.foodName = foodName; }
-
-    public double getQuantity() { return quantity; }
-    public void setQuantity(double quantity) { this.quantity = quantity; }
-
-    public double getCalories() { return calories; }
-    public void setCalories(double calories) { this.calories = calories; }
 
     public double getFat() { return fat; }
     public void setFat(double fat) { this.fat = fat; }
@@ -100,16 +76,4 @@ public class MealLog extends HealthLog {
 
     public double getIron() { return iron; }
     public void setIron(double iron) { this.iron = iron; }
-
-    @Override
-    protected void displaySpecificDetails() {
-        System.out.println("Meal ID: " + mealId);
-        System.out.println("Meal Type: " + mealType);
-        System.out.println("Food ID: " + foodId);
-        System.out.println("Food Name: " + foodName);
-        System.out.println("Quantity: " + quantity);
-        System.out.println("Calories: " + calories);
-        System.out.println("Fat: " + fat);
-        System.out.println("Protein: " + protein);
-    }
 }

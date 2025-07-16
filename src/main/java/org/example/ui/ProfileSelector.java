@@ -47,16 +47,16 @@ class Dashboard extends JFrame {
         container.setBackground(new Color(210, 255, 232));
 
         // Add cards
-        container.add(makeCard("<html><div>👤<br>Edit Profile & Goal</div></html>", e -> new ProfileEditor(profileId).setVisible(true)));
+        container.add(makeCard("<html><div>👤<br>Edit Profile</div></html>", e -> new ProfileEditor(profileId).setVisible(true)));
         container.add(makeCard("<html><div>📈<br>View My BMR</div></html>", e -> new BMRWindow(profileId).setVisible(true)));
-//        container.add(makeCard("<html><div>📊<br>Nutrient Chart</div></html>", e -> new NutrientChartWindow().setVisible(true)));
-//        container.add(makeCard("<html><div>📉<br>Compare Intake</div></html>", null));
+        container.add(makeCard("<html><div>📊<br>Nutrient Chart</div></html>", e -> new NutrientChartWindow().setVisible(true)));
+        container.add(makeCard("<html><div>📉<br>Compare Intake</div></html>", null));
         container.add(makeCard("<html><div>📖<br>Log a Meal</div></html>", e -> new MealLogger(profileId).setVisible(true)));
         container.add(makeCard("<html><div>🍽<br>View Meals</div></html>", e -> new MealViewer(profileId).setVisible(true)));
         container.add(makeCard("<html><div>🏃<br>Log Exercise</div></html>", e -> new ExerciseLogger(profileId).setVisible(true)));
         container.add(makeCard("<html><div>🏋🏽<br>View Exercises</div></html>", e -> new ExerciseViewer(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>🔁<br>Suggest Swaps</div></html>", e -> new SuggestSwap(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>🥗<br>Canada Food Guide</div></html>",  e -> new CanadaGuideChart(profileId).setVisible(true)));
+        container.add(makeCard("<html><div>🔁<br>Suggest Swaps</div></html>", null));
+        container.add(makeCard("<html><div>🥗<br>Canada Food Guide</div></html>", null));
 
         // Setup main layout
         getContentPane().setBackground(new Color(210, 255, 232));
