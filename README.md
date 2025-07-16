@@ -2,7 +2,7 @@
 
 By Team Bravo | EECS 3311 — Summer 2025
 
-NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL, and CNF 2015 data. It allows users to create personalized profiles, log meals, analyze nutrient intake (like calories, carbs, iron, etc.), and visualize meal information — with support for smart food swaps and more charts to be added in a future release.
+NutriSci is a Java-based desktop nutrition tracking app built using Swing, MySQL, and CNF 2015 data. It allows users to create personalized profiles, log meals, analyze nutrient intake (like calories, carbs, iron, etc.), and visualize meal information with support for smart food swaps and more charts.
 
 ---
 
@@ -236,15 +236,6 @@ NutriSci/
 ├── README.md
 └── data/                  # contains all CNF CSVs (ignored by Git)
 ```
-
----
-
-## 🔭 Coming Soon
-
-* ♻️ Smart food swaps (goal-driven replacements)
-* 📈 Nutrient comparisons (before/after swap)
-* 📊 More Charts using JFreeChart
-* 🥗 Canada Food Guide alignment visualization
 
 ---
 
