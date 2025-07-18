@@ -1,5 +1,6 @@
 package org.example.ui;
 
+import org.example.dao.CentralDAO;
 import org.example.dao.UserProfileDAO;
 import org.example.model.UserProfile;
 
@@ -24,6 +25,7 @@ public class BMRWindow extends JFrame {
         add(new JScrollPane(textPane), BorderLayout.CENTER);
         add(closeButton, BorderLayout.SOUTH);
 
+        CentralDAO centralDAO = CentralDAO.getInstance();
         UserProfile profile = UserProfileDAO.getById(profileId);
 
         if (profile != null) {

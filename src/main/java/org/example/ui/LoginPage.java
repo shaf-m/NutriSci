@@ -2,9 +2,13 @@ package org.example.ui;
 
 import javax.swing.*;
 import java.awt.*;
+
+import org.example.dao.CentralDAO;
 import org.example.dao.UserProfileDAO;
 
 public class LoginPage extends JFrame {
+    UserProfileDAO userProfileDAO;
+
     public LoginPage() {
         setTitle("NutriSci Login");
         setSize(480, 420);
@@ -19,6 +23,8 @@ public class LoginPage extends JFrame {
         logoLabel.setForeground(new Color(34, 139, 87));
         logoLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
         add(logoLabel, BorderLayout.NORTH);
+        CentralDAO centralDAO = CentralDAO.getInstance();
+        userProfileDAO = centralDAO.getUserProfileDAO();
 
         // Tabbed pane for login/signup, I honestly think tabs seemed the cleanest but up to you
         JTabbedPane tabs = new JTabbedPane();
@@ -44,6 +50,8 @@ public class LoginPage extends JFrame {
         passwordField.setPreferredSize(new Dimension(250, 40));
         passwordField.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 
+        CentralDAO centralDAO = CentralDAO.getInstance();
+
         // Login button
         JButton loginBtn = new JButton("Log In");
         loginBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -55,8 +63,8 @@ public class LoginPage extends JFrame {
         loginBtn.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
-            if (UserProfileDAO.authenticate(username, password)) {
-                int profileId = UserProfileDAO.getProfileId(username);
+            if (userProfileDAO.authenticate(username, password)) {
+                int profileId = userProfileDAO.getProfileId(username);
                 new Dashboard(profileId).setVisible(true);
                 dispose();
             } else {
@@ -112,7 +120,7 @@ public class LoginPage extends JFrame {
                 return;
             }
 
-            if (UserProfileDAO.createAccount(username, password)) {
+            if (userProfileDAO.createAccount(username, password)) {
                 JOptionPane.showMessageDialog(this, "Account created! Please complete your profile.");
                 new ProfileForm(true, username).setVisible(true);
                 dispose();

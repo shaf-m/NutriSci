@@ -1,13 +1,23 @@
 package org.example.dao;
 
+import org.apache.commons.logging.impl.LogFactoryImpl;
+import org.example.model.HealthLogFactory;
+import org.example.model.LogFactory;
 import org.example.model.MealLog;
+import org.example.model.MealLogFactory;
 
 import java.sql.*;
 import java.util.*;
 
 public class MealLogDAO {
-    public static void insertMeal(int profileId, java.util.Date mealDate, String type, int foodId, double quantity) {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+    MealLogFactory logFactory;
+
+    public MealLogDAO() {
+        logFactory = new MealLogFactory();
+    }
+
+    public void insertMeal(int profileId, java.util.Date mealDate, String type, int foodId, double quantity) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO meal_log (ProfileID, MealDate, MealType, FoodID, Quantity) VALUES (?, ?, ?, ?, ?)")) {
             stmt.setInt(1, profileId);
@@ -21,9 +31,9 @@ public class MealLogDAO {
         }
     }
 
-    public static List<MealLog> getMealsByProfile(int profileId) {
+    public List<MealLog> getMealsByProfile(int profileId) {
         List<MealLog> meals = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ml.*, fn.FoodDescription FROM meal_log ml " +
                              "JOIN food_name fn ON ml.FoodID = fn.FoodID " +
@@ -37,14 +47,14 @@ public class MealLogDAO {
                 int foodId = rs.getInt("FoodID");
                 double qty = rs.getDouble("Quantity");
 
-                MealLog meal = new MealLog(
+                MealLog meal = (MealLog)logFactory.createLog(
                         rs.getInt("ProfileID"),
                         rs.getDate("MealDate"),
                         rs.getString("MealType"),
                         foodId,
                         qty
                 );
-                meal.setMealId(mealId);
+                meal.setLogId(mealId);
                 meal.setFoodName(rs.getString("FoodDescription")); // Set readable food name
 
                 loadNutrientSummary(conn, meal);
@@ -56,16 +66,16 @@ public class MealLogDAO {
         return meals;
     }
 
-    private static void loadNutrientSummary(Connection conn, MealLog meal) {
+    private void loadNutrientSummary(Connection conn, MealLog meal) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "SELECT NutrientNameID, NutrientValue " +
+                "SELECT NutrientID, NutrientValue " +
                         "FROM nutrient_amount " +
                         "WHERE FoodID = ?")) {
             stmt.setInt(1, meal.getFoodId());
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("NutrientNameID");
+                int id = rs.getInt("NutrientID");
                 double value = rs.getDouble("NutrientValue") * (meal.getQuantity() / 100);
 
                 switch (id) {

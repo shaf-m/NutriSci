@@ -1,50 +1,25 @@
 package org.example.model;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class ExerciseLog extends HealthLog {
-    private int exerciseId;
-    private String exerciseType;
-    private int durationMinutes;
-    private double caloriesBurned;
 
-    public int getExerciseId() {
-        return exerciseId;
+    public ExerciseLog() { super(); }
+
+    public ExerciseLog(int profileId, java.sql.Date exerciseDate, String exerciseType, int duration) {
+        super(profileId, exerciseDate, exerciseType, duration);
     }
 
-    public void setExerciseId(int exerciseId) {
-        this.exerciseId = exerciseId;
-    }
-
-    public String getExerciseType() {
-        return exerciseType;
-    }
-
-    public void setExerciseType(String exerciseType) {
-        this.exerciseType = exerciseType;
+    public ExerciseLog(int exerciseId, int profileId, Date exerciseDate, String exerciseType, int duration) {
+        super(exerciseId, profileId, exerciseDate, exerciseType, duration);
     }
 
     public int getDurationMinutes() {
-        return durationMinutes;
+        return (int)getQuantity();
     }
 
     public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
+        setQuantity(durationMinutes);
     }
 
-    public double getCaloriesBurned() {
-        return caloriesBurned;
-    }
-
-    public void setCaloriesBurned(double caloriesBurned) {
-        this.caloriesBurned = caloriesBurned;
-    }
-
-    @Override
-    protected void displaySpecificDetails() {
-        System.out.println("Exercise ID: " + exerciseId);
-        System.out.println("Exercise Type: " + exerciseType);
-        System.out.println("Duration (minutes): " + durationMinutes);
-        System.out.println("Calories Burned: " + caloriesBurned);
-    }
 }

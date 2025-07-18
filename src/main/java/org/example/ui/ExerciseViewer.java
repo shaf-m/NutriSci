@@ -1,7 +1,9 @@
 package org.example.ui;
 
+import org.example.dao.CentralDAO;
 import org.example.dao.ExerciseLogDAO;
 import org.example.model.ExerciseLog;
+import org.example.model.HealthLog;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,10 +16,11 @@ public class ExerciseViewer extends JFrame {
         setSize(650, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        CentralDAO centralDAO = CentralDAO.getInstance();
 
         List<ExerciseLog> logs;
         try {
-            logs = ExerciseLogDAO.getLogsByProfile(profileId);
+            logs = centralDAO.getExerciseLogDAO().getLogsByProfile(profileId);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Failed to load exercise logs.");
             e.printStackTrace();
@@ -30,9 +33,9 @@ public class ExerciseViewer extends JFrame {
         for (ExerciseLog log : logs) {
             model.addRow(new Object[]{
                     log.getLogDate().toString(),
-                    log.getExerciseType(),
+                    log.getLogType(),
                     log.getDurationMinutes(),
-                    String.format("%.1f", log.getCaloriesBurned())
+                    String.format("%.1f", log.getCalories())
             });
         }
 

@@ -8,10 +8,14 @@ import java.sql.Statement;
 public class CNFTestQuery {
     public static void main(String[] args) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+            System.out.println("Import complete. 1");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
+            System.out.println("Import complete. 2");
             CNFImporter importer = new CNFImporter(conn);
+            System.out.println("Import complete. 3");
             importer.importNutrientAmount("data/NUTRIENT AMOUNT.csv");
-            System.out.println("Import complete.");
+            System.out.println("Import complete. 4");
+            System.out.println("Import complete. 5");
         } catch (Exception e) {
             e.printStackTrace();
         }

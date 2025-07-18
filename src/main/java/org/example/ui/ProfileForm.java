@@ -79,7 +79,7 @@ public class ProfileForm extends JFrame {
             double height = Double.parseDouble(heightText);
             double weight = Double.parseDouble(weightText);
 
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
             PreparedStatement stmt = conn.prepareStatement(
                     "UPDATE user_profile SET Name=?, Sex=?, DateOfBirth=?, Height_cm=?, Weight_kg=?, Units=? " +
                             "WHERE Username=?", Statement.RETURN_GENERATED_KEYS);

@@ -16,10 +16,10 @@ CREATE TABLE food_source (
 
 
 CREATE TABLE nutrient_name (
-    NutrientNameID INT PRIMARY KEY,
+    NutrientID INT PRIMARY KEY,
     NutrientCode INT,
     NutrientSymbol VARCHAR(10),
-    Unit VARCHAR(8), --NutrientUnit
+    NutrientUnit VARCHAR(8),
     NutrientName VARCHAR(200),
     NutrientNameF VARCHAR(200),
     Tagname VARCHAR(20),
@@ -37,22 +37,22 @@ CREATE TABLE nutrient_source (
 
 CREATE TABLE measure_name (
     MeasureID INT PRIMARY KEY,
-    MeasureName VARCHAR(200), --MeasureDescription
-    MeasureNameF VARCHAR(200) --MeasureDescriptionF
+    MeasureDescription VARCHAR(200),
+    MeasureDescriptionF VARCHAR(200)
 );
 
 
 CREATE TABLE refuse_name (
     RefuseID INT PRIMARY KEY,
-    RefuseName VARCHAR(200),--RefuseDescription
-    RefuseNameF VARCHAR(200) --RefuseDescriptionF
+    RefuseDescription VARCHAR(200),
+    RefuseDescriptionF VARCHAR(200)
 );
 
 
 CREATE TABLE yield_name (
     YieldID INT PRIMARY KEY,
-    YieldName VARCHAR(200), --YieldDescription
-    YieldNameF VARCHAR(200) --YieldDescriptionF
+    YieldDescription VARCHAR(200),
+    YieldDescriptionF VARCHAR(200)
 );
 
 
@@ -96,7 +96,7 @@ CREATE TABLE yield_amount (
     FoodID INT,
     YieldID INT,
     YieldAmount DECIMAL(9,5),
-    YieldDateOfEntry DATE,
+    YieldDateofEntry DATE,
     PRIMARY KEY (FoodID, YieldID),
     FOREIGN KEY (FoodID) REFERENCES food_name(FoodID),
     FOREIGN KEY (YieldID) REFERENCES yield_name(YieldID)
@@ -105,13 +105,13 @@ CREATE TABLE yield_amount (
 
 CREATE TABLE nutrient_amount (
     FoodID INT,
-    NutrientNameID INT,
-    NutrientSourceID INT,
+    NutrientID INT,
     NutrientValue DECIMAL(12,5),
     StandardError DECIMAL(8,4),
     NumberOfObservations INT,
-    NutrientDateEntry DATE,
-    PRIMARY KEY (FoodID, NutrientNameID),
+    NutrientSourceID INT,
+    NutrientDateOfEntry DATE,
+    PRIMARY KEY (FoodID, NutrientID),
     FOREIGN KEY (FoodID) REFERENCES food_name(FoodID),
     FOREIGN KEY (NutrientNameID) REFERENCES nutrient_name(NutrientNameID),
     FOREIGN KEY (NutrientSourceID) REFERENCES nutrient_source(NutrientSourceID)

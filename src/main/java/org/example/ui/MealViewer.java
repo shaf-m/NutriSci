@@ -1,5 +1,6 @@
 package org.example.ui;
 
+import org.example.dao.CentralDAO;
 import org.example.dao.MealLogDAO;
 import org.example.model.MealLog;
 
@@ -18,7 +19,10 @@ import org.jfree.data.general.DefaultPieDataset;
 public class MealViewer extends JFrame {
     private JPanel cardContainer;
 
+    private MealLogDAO mealLogDAO;
     public MealViewer(int profileId) {
+        CentralDAO centralDAO = CentralDAO.getInstance();
+        mealLogDAO = centralDAO.getMealLogDAO();
         setTitle("🍽️ Meal Log Viewer");
         setSize(750, 600);
         setLocationRelativeTo(null);
@@ -26,7 +30,7 @@ public class MealViewer extends JFrame {
         setLayout(new BorderLayout());
 
         // Fetch meals
-        List<MealLog> allMeals = MealLogDAO.getMealsByProfile(profileId);
+        List<MealLog> allMeals = mealLogDAO.getMealsByProfile(profileId);
 
         // Extract unique dates
         Set<String> uniqueDates = allMeals.stream()
@@ -85,7 +89,7 @@ public class MealViewer extends JFrame {
             card.setBackground(new Color(250, 250, 250));
 
             JLabel title = new JLabel(String.format("🍽 %s | 🍎 %s (ID: %d)",
-                    meal.getMealType(), meal.getFoodName(), meal.getFoodId()), SwingConstants.CENTER);
+                    meal.getLogType(), meal.getFoodName(), meal.getFoodId()), SwingConstants.CENTER);
             title.setFont(new Font("SansSerif", Font.BOLD, 14));
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
