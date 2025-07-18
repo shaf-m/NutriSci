@@ -110,10 +110,10 @@ public class MealViewer extends JFrame {
                     meal.getSugars(),
                     meal.getFiber(),
                     meal.getCholesterol(),
-                    meal.getSodium(),
-                    meal.getPotassium(),
-                    meal.getCalcium(),
-                    meal.getIron()
+                    meal.getSodium()/1000,
+                    meal.getPotassium()/1000,
+                    meal.getCalcium()/1000,
+                    meal.getIron()/1000
             ));
             details.setFont(new Font("Monospaced", Font.PLAIN, 12));
             details.setEditable(false);
@@ -149,24 +149,32 @@ public class MealViewer extends JFrame {
     }
 
     private JFreeChart createNutrientPieChart(MealLog meal) {
+        DefaultPieDataset dataset = new DefaultPieDataset();
+
         double protein = meal.getProtein();
         double carbs = meal.getCarbohydrates();
         double fat = meal.getFat();
+        double fiber = meal.getFiber();
+        double cholesterol = meal.getCholesterol();
+        double sodium = meal.getSodium();
 
-        DefaultPieDataset dataset = new DefaultPieDataset();
-        if (protein + carbs + fat > 0) {
+        double total = protein + carbs + fat + fiber + cholesterol + sodium;
+
+        if (total > 0) {
             dataset.setValue("Protein", protein);
             dataset.setValue("Carbohydrates", carbs);
             dataset.setValue("Fat", fat);
+            dataset.setValue("Fiber", fiber);
+            dataset.setValue("Cholesterol", cholesterol/1000);
+            dataset.setValue("Sodium", sodium/1000);
         } else {
-            dataset.setValue("No Data", 1); // show empty fallback for now idk
+            dataset.setValue("No Data", 1);
         }
 
         JFreeChart chart = ChartFactory.createPieChart(
-                "Macronutrient Composition (g)", dataset, true, true, false
+                "Nutrient Composition (g/mg)", dataset, true, true, false
         );
 
-        // Set white background
         chart.setBackgroundPaint(Color.WHITE);
         chart.getPlot().setBackgroundPaint(Color.WHITE);
 

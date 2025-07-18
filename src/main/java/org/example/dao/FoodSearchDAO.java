@@ -6,7 +6,7 @@ import java.util.*;
 public class FoodSearchDAO {
     public static Map<String, Integer> searchFoods(String query) {
         Map<String, Integer> results = new LinkedHashMap<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT FoodID, FoodDescription FROM food_name WHERE FoodDescription LIKE ? LIMIT 20")) {
             stmt.setString(1, "%" + query + "%");

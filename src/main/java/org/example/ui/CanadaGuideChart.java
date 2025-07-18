@@ -15,6 +15,7 @@ public class CanadaGuideChart extends JFrame {
     private int profileId;
     private JComboBox<String> dateComboBox;
     private ChartPanel chartPanel;
+    private JLabel guideFeedbackLabel;
 
     public CanadaGuideChart(int profileId) {
         this.profileId = profileId;
@@ -38,16 +39,86 @@ public class CanadaGuideChart extends JFrame {
         });
 
         panel.add(dateComboBox, BorderLayout.NORTH);
+
         chartPanel = new ChartPanel(null);
         chartPanel.setPreferredSize(new Dimension(550, 400));
         panel.add(chartPanel, BorderLayout.CENTER);
 
+        // Initialize feedback label before using it
+        guideFeedbackLabel = new JLabel("Loading Canada Food Guide comparison...", SwingConstants.CENTER);
+        guideFeedbackLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        panel.add(guideFeedbackLabel, BorderLayout.SOUTH);
+
         add(panel);
 
+        // Trigger chart and feedback for the first available date
         if (dateComboBox.getItemCount() > 0) {
-            dateComboBox.setSelectedIndex(0); // Auto-load the most recent date
+            dateComboBox.setSelectedIndex(0);
+            String selectedDate = (String) dateComboBox.getSelectedItem();
+            if (selectedDate != null) {
+                updateChart(LocalDate.parse(selectedDate));
+            }
         }
     }
+
+    private void updateFeedbackLabel(DefaultPieDataset dataset) {
+        double veg = dataset.getValue("Vegetables/Fruits").doubleValue();
+        double protein = dataset.getValue("Protein").doubleValue();
+        double grains = dataset.getValue("Whole Grains").doubleValue();
+
+        double sum = veg + protein + grains;
+        if (sum == 0) sum = 1; // prevent division by zero
+
+        double vegPercent = (veg / sum) * 100;
+        double proteinPercent = (protein / sum) * 100;
+        double grainsPercent = (grains / sum) * 100;
+
+        StringBuilder blurb = new StringBuilder();
+
+        // Veg/Fruits comparison
+        if (vegPercent < 45) {
+            blurb.append("🥦 Try to increase vegetables and fruits to fill half your plate.<br>");
+        } else if (vegPercent >= 55) {
+            blurb.append("✅ Great job meeting or exceeding the veggie/fruit target!<br>");
+        } else {
+            blurb.append("👍 You're close to the recommended veggies/fruits amount.<br>");
+        }
+
+        // Protein comparison
+        if (proteinPercent < 20) {
+            blurb.append("🍗 Consider adding more protein foods to cover a quarter of your plate.<br>");
+        } else if (proteinPercent > 30) {
+            blurb.append("🍗 Your protein intake is a bit high compared to recommendations.<br>");
+        } else {
+            blurb.append("👍 Your protein intake is well balanced.<br>");
+        }
+
+        // Whole grains comparison
+        if (grainsPercent < 20) {
+            blurb.append("🍞 Add more whole grains to reach a quarter of your plate.<br>");
+        } else if (grainsPercent > 30) {
+            blurb.append("🍞 You might want to reduce whole grains slightly for better balance.<br>");
+        } else {
+            blurb.append("👍 Your whole grain intake looks good.<br>");
+        }
+
+        String instructions = String.format("""
+        <html><div style='text-align: center;'>
+        <b>Your Meal Breakdown (normalized):</b><br>
+        🥦 Vegetables & Fruits: %.1f%%<br>
+        🍗 Protein Foods: %.1f%%<br>
+        🍞 Whole Grains: %.1f%%<br><br>
+        <b>Canada Food Guide recommends:</b><br>
+        - Half your plate should be vegetables and fruits.<br>
+        - A quarter should be protein foods.<br>
+        - A quarter should be whole grains.<br><br>
+        %s
+        </div></html>
+        """, vegPercent, proteinPercent, grainsPercent, blurb.toString());
+
+        guideFeedbackLabel.setText(instructions);
+    }
+
 
     private void loadMealDates() {
         Set<String> dates = new LinkedHashSet<>();
@@ -83,6 +154,8 @@ public class CanadaGuideChart extends JFrame {
         plot.setSectionPaint("Whole Grains", new Color(255, 204, 102));
 
         chartPanel.setChart(chart);
+
+        updateFeedbackLabel(dataset);
     }
 
     private DefaultPieDataset getFoodGroupBreakdown(LocalDate date) {

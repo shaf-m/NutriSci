@@ -146,15 +146,15 @@ public class SuggestSwap extends JFrame {
             return;
         }
 
-        // Find NutrientNameID
+        // Find NutrientID
         int nutrientId = -1;
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT NutrientNameID FROM nutrient_name WHERE NutrientName LIKE ?")) {
+                     "SELECT NutrientID FROM nutrient_name WHERE NutrientName LIKE ?")) {
             stmt.setString(1, nutrient + "%");
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                nutrientId = rs.getInt("NutrientNameID");
+                nutrientId = rs.getInt("NutrientID");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -171,10 +171,10 @@ public class SuggestSwap extends JFrame {
         double oldMealNutrientTotal = 0;
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT SUM(na.NutrientValue * ml.Quantity) AS totalNutrient " +
+                     "SELECT SUM(na.NutrientValue * ml.Quantity / 100) AS totalNutrient " +
                              "FROM meal_log ml " +
                              "JOIN nutrient_amount na ON ml.FoodID = na.FoodID " +
-                             "WHERE ml.MealID = ? AND na.NutrientNameID = ?")) {
+                             "WHERE ml.MealID = ? AND na.NutrientID = ?")) {
             stmt.setInt(1, mealId);
             stmt.setInt(2, nutrientId);
             ResultSet rs = stmt.executeQuery();
@@ -225,7 +225,7 @@ public class SuggestSwap extends JFrame {
                      "SELECT f.FoodDescription, n.NutrientValue " +
                              "FROM food_name f " +
                              "JOIN nutrient_amount n ON f.FoodID = n.FoodID " +
-                             "WHERE n.NutrientNameID = ? " +
+                             "WHERE n.NutrientID = ? " +
                              (goalType.equalsIgnoreCase("increase") ?
                                      "AND n.NutrientValue >= ?" :
                                      "AND n.NutrientValue <= ?") +
@@ -256,7 +256,7 @@ public class SuggestSwap extends JFrame {
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT n.NutrientValue FROM food_name f " +
                              "JOIN nutrient_amount n ON f.FoodID = n.FoodID " +
-                             "WHERE n.NutrientNameID = ? " +
+                             "WHERE n.NutrientID = ? " +
                              (goalType.equalsIgnoreCase("increase") ?
                                      "AND n.NutrientValue >= ?" :
                                      "AND n.NutrientValue <= ?") +
