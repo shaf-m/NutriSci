@@ -24,6 +24,7 @@ public class MealLogger extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(210, 255, 232));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);

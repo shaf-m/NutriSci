@@ -23,6 +23,7 @@ public class ExerciseLogger extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
+        panel.setBackground(new Color(210, 255, 232));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JTextField dateField = new JTextField(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));

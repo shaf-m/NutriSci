@@ -50,6 +50,7 @@ public class ExerciseViewer extends JFrame {
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
 
         setLayout(new BorderLayout());
+        getContentPane().setBackground(new Color(210, 255, 232));
         add(title, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
     }

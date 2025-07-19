@@ -28,7 +28,7 @@ public class MealViewer extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-
+        getContentPane().setBackground(new Color(210, 255, 232));
         // Fetch meals
         List<MealLog> allMeals = mealLogDAO.getMealsByProfile(profileId);
 
@@ -46,15 +46,17 @@ public class MealViewer extends JFrame {
         });
 
         JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topBar.setBackground(new Color(210, 255, 232));
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
         topBar.add(new JLabel("Select Date:"));
         topBar.add(dateSelector);
 
         cardContainer = new JPanel();
         cardContainer.setLayout(new BoxLayout(cardContainer, BoxLayout.Y_AXIS));
-        cardContainer.setBackground(Color.WHITE);
+        cardContainer.setBackground(new Color(210, 255, 232));
 
         JScrollPane scrollPane = new JScrollPane(cardContainer);
+        scrollPane.setBackground(new Color(210, 255, 232));
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 

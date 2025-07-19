@@ -14,10 +14,12 @@ public class BMRWindow extends JFrame {
         setSize(400, 400);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(new Color(210, 255, 232));
 
         JTextPane textPane = new JTextPane();
         textPane.setContentType("text/html");
         textPane.setEditable(false);
+        textPane.setBackground(new Color(210, 255, 232));
 
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dispose());

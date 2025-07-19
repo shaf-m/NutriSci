@@ -21,11 +21,12 @@ public class CanadaGuideChart extends JFrame {
         this.profileId = profileId;
 
         setTitle("Canada Food Guide Alignment");
-        setSize(600, 500);
+        setSize(600, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(new Color(210, 255, 232));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         dateComboBox = new JComboBox<>();
@@ -148,10 +149,13 @@ public class CanadaGuideChart extends JFrame {
                 true, true, false
         );
 
+        chart.setBackgroundPaint(new Color(210, 255, 232));
+
         PiePlot plot = (PiePlot) chart.getPlot();
         plot.setSectionPaint("Vegetables/Fruits", new Color(102, 204, 102));
         plot.setSectionPaint("Protein", new Color(188, 39, 44));
         plot.setSectionPaint("Whole Grains", new Color(255, 204, 102));
+        plot.setBackgroundPaint(new Color(210, 255, 232));
 
         chartPanel.setChart(chart);
 

@@ -25,6 +25,7 @@ public class ProfileEditor extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridLayout(8, 2, 10, 10));
+        panel.setBackground(new Color(210, 255, 232));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         heightField = new JTextField();
