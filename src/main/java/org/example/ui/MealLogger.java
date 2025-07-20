@@ -74,6 +74,7 @@ public class MealLogger extends JFrame {
         panel.add(new JLabel("Search Food:"), gbc);
         gbc.gridx = 1;
         JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.setBackground(new Color(210, 255, 232));
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.EAST);
         panel.add(searchPanel, gbc);

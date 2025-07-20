@@ -3,6 +3,7 @@ package org.example.ui;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -10,6 +11,10 @@ import org.jfree.chart.*;
 import org.jfree.chart.plot.*;
 import org.jfree.data.category.*;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+
 import java.awt.Color;
 
 
@@ -21,11 +26,16 @@ public class SuggestSwap extends JFrame {
     private int profileId;
     private Map<String, Integer> mealMap = new LinkedHashMap<>(); // Meal label → MealID
     private ChartPanel chartPanel;
+    private JRadioButton applyAllButton;
+    private JRadioButton applyRangeButton;
+    private JSpinner startDatePicker, endDatePicker;
+    private JButton applySwapButton;
+    private String currentNutrient = "";
 
     public SuggestSwap(int profileId) {
         this.profileId = profileId;
         setTitle("Suggest Swaps");
-        setSize(1000, 500);
+        setSize(1200, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -42,16 +52,66 @@ public class SuggestSwap extends JFrame {
         suggestButton = new JButton("Suggest Swaps");
         closeButton = new JButton("Close");
 
-        JPanel topPanel = new JPanel(new GridLayout(3, 1, 5, 5));
+        // Create topPanel with BoxLayout for vertical alignment
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(new Color(210, 255, 232));
+
+        goalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         topPanel.add(goalLabel);
-        topPanel.add(new JLabel("Select Meal:"));
+
+        JLabel mealLabel = new JLabel("<html><br>Select Meal:</html>");
+        mealLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        topPanel.add(mealLabel);
+
+        mealComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         topPanel.add(mealComboBox);
+
+        applyAllButton = new JRadioButton("Apply to All Meals");
+        applyRangeButton = new JRadioButton("Apply to Date Range");
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(applyAllButton);
+        group.add(applyRangeButton);
+        applyAllButton.setSelected(true);
+
+        startDatePicker = new JSpinner(new SpinnerDateModel());
+        endDatePicker = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor startEditor = new JSpinner.DateEditor(startDatePicker, "yyyy-MM-dd");
+        JSpinner.DateEditor endEditor = new JSpinner.DateEditor(endDatePicker, "yyyy-MM-dd");
+        startDatePicker.setEditor(startEditor);
+        endDatePicker.setEditor(endEditor);
+
+        JPanel rangePanel = new JPanel(new GridLayout(2, 2));
+        rangePanel.setBackground(new Color(210, 255, 232));
+        rangePanel.add(new JLabel("Start Date:"));
+        rangePanel.add(startDatePicker);
+        rangePanel.add(new JLabel("End Date:"));
+        rangePanel.add(endDatePicker);
+
+        // Wrap radio buttons and range panel in a subpanel to keep things tidy
+        JPanel applyPanel = new JPanel();
+        applyPanel.setBackground(new Color(210, 255, 232));
+        applyPanel.setLayout(new BoxLayout(applyPanel, BoxLayout.Y_AXIS));
+        applyAllButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        applyRangeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rangePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        applyPanel.add(applyAllButton);
+        applyPanel.add(applyRangeButton);
+        applyPanel.add(rangePanel);
+
+        applyPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        topPanel.add(Box.createRigidArea(new Dimension(0, 10))); // spacer
+        topPanel.add(applyPanel);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(new Color(210, 255, 232));
         buttonPanel.add(suggestButton);
         buttonPanel.add(closeButton);
+
+        applySwapButton = new JButton("Apply Swap");
+        buttonPanel.add(applySwapButton);
 
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -62,10 +122,11 @@ public class SuggestSwap extends JFrame {
 
         suggestButton.addActionListener(e -> suggestSwaps());
         closeButton.addActionListener(e -> dispose());
+        applySwapButton.addActionListener(e -> applySwap());
 
         add(panel);
 
-        // Initialize empty chart
+        // Initialize empty chart (unchanged)
         JFreeChart chart = ChartFactory.createBarChart(
                 "Nutrient Comparison",
                 "Source",
@@ -150,6 +211,8 @@ public class SuggestSwap extends JFrame {
             suggestionsArea.setText("Error reading user goal.");
             return;
         }
+
+        currentNutrient = nutrient;
 
         // Find NutrientID
         int nutrientId = -1;
@@ -341,6 +404,239 @@ public class SuggestSwap extends JFrame {
         chartPanel.setChart(chart);
     }
 
+    private void applySwap() {
+        String selectedMeal = (String) mealComboBox.getSelectedItem();
+        if (selectedMeal == null) {
+            JOptionPane.showMessageDialog(this, "Please select a meal first.");
+            return;
+        }
+
+        int originalMealId = mealMap.get(selectedMeal);
+        // Find original foods from that meal
+        int oldFoodId = -1, newFoodId = -1;
+        double maxValue = 0;
+
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT FoodID FROM meal_log WHERE MealID = ?")) {
+            stmt.setInt(1, originalMealId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                oldFoodId = rs.getInt("FoodID");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
+
+        if (oldFoodId == -1) {
+            JOptionPane.showMessageDialog(this, "Could not determine original food to swap.");
+            return;
+        }
+
+        // Find best suggested food from current suggestion (hardcoded again, ideally store selection)
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT na.FoodID, na.NutrientValue FROM nutrient_amount na " +
+                             "WHERE na.NutrientID = (SELECT NutrientID FROM nutrient_name WHERE NutrientName LIKE ?) " +
+                             "ORDER BY na.NutrientValue DESC LIMIT 1")) {
+            stmt.setString(1, currentNutrient + "%");
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                newFoodId = rs.getInt("FoodID");
+                maxValue = rs.getDouble("NutrientValue");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        if (newFoodId == -1) {
+            JOptionPane.showMessageDialog(this, "No suitable substitute found.");
+            return;
+        }
+
+        // Date filtering
+        String sql = "UPDATE meal_log SET FoodID = ? WHERE ProfileID = ? AND FoodID = ?";
+        if (applyRangeButton.isSelected()) {
+            sql += " AND MealDate BETWEEN ? AND ?";
+        }
+
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, newFoodId);
+            stmt.setInt(2, profileId);
+            stmt.setInt(3, oldFoodId);
+            if (applyRangeButton.isSelected()) {
+                java.sql.Date start = new java.sql.Date(((java.util.Date) startDatePicker.getValue()).getTime());
+                java.sql.Date end = new java.sql.Date(((java.util.Date) endDatePicker.getValue()).getTime());
+                stmt.setDate(4, start);
+                stmt.setDate(5, end);
+            }
+
+            int rows = stmt.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Applied swap to " + rows + " meals.");
+
+            logSwap(profileId, oldFoodId, newFoodId); // Optional
+            showBeforeAfterCharts(oldFoodId, newFoodId);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void logSwap(int profileId, int oldFoodId, int newFoodId) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO swap_log (ProfileID, OldFoodID, NewFoodID, MealDate) VALUES (?, ?, ?, NOW())")) {
+            stmt.setInt(1, profileId);
+            stmt.setInt(2, oldFoodId);
+            stmt.setInt(3, newFoodId);
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+//    private void showBeforeAfterCharts(int oldFoodId, int newFoodId) {
+//        TimeSeries pre = new TimeSeries("Before Swap");
+//        TimeSeries post = new TimeSeries("After Swap");
+//
+//        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "")) {
+//
+//            // Step 1: Get nutrient per 100g of newFoodId (used for simulation)
+//            double simulatedNutrientPer100 = 0;
+//            try (PreparedStatement nutrientStmt = conn.prepareStatement(
+//                    "SELECT na.NutrientValue " +
+//                            "FROM nutrient_amount na " +
+//                            "JOIN nutrient_name nn ON na.NutrientID = nn.NutrientID " +
+//                            "WHERE na.FoodID = ? AND nn.NutrientName LIKE ?")) {
+//                nutrientStmt.setInt(1, newFoodId);
+//                nutrientStmt.setString(2, currentNutrient + "%");
+//
+//                ResultSet rs = nutrientStmt.executeQuery();
+//                if (rs.next()) {
+//                    simulatedNutrientPer100 = rs.getDouble("NutrientValue");
+//                }
+//            }
+//
+//            // Step 2: Query meal_log where oldFoodId was eaten
+//            try (PreparedStatement stmt = conn.prepareStatement(
+//                    "SELECT MealDate, Quantity " +
+//                            "FROM meal_log " +
+//                            "WHERE ProfileID = ? AND FoodID = ?")) {
+//
+//                stmt.setInt(1, profileId);
+//                stmt.setInt(2, oldFoodId);
+//                ResultSet rs = stmt.executeQuery();
+//
+//                Map<Date, Double> preMap = new HashMap<>();
+//                Map<Date, Double> postMap = new HashMap<>();
+//
+//                // Step 3: Get nutrient per 100g of oldFoodId
+//                double originalNutrientPer100 = 0;
+//                try (PreparedStatement origStmt = conn.prepareStatement(
+//                        "SELECT na.NutrientValue " +
+//                                "FROM nutrient_amount na " +
+//                                "JOIN nutrient_name nn ON na.NutrientID = nn.NutrientID " +
+//                                "WHERE na.FoodID = ? AND nn.NutrientName LIKE ?")) {
+//                    origStmt.setInt(1, oldFoodId);
+//                    origStmt.setString(2, currentNutrient + "%");
+//                    ResultSet origRs = origStmt.executeQuery();
+//                    if (origRs.next()) {
+//                        originalNutrientPer100 = origRs.getDouble("NutrientValue");
+//                    }
+//                }
+//
+//                // Step 4: Calculate before/after values
+//                while (rs.next()) {
+//                    Date date = rs.getDate("MealDate");
+//                    double qty = rs.getDouble("Quantity");
+//
+//                    double preVal = originalNutrientPer100 * qty / 100.0;
+//                    double postVal = simulatedNutrientPer100 * qty / 100.0;
+//
+//                    preMap.merge(date, preVal, Double::sum);
+//                    postMap.merge(date, postVal, Double::sum);
+//                }
+//
+//                for (Date date : preMap.keySet()) {
+//                    pre.addOrUpdate(new Day(date), preMap.get(date));
+//                    post.addOrUpdate(new Day(date), postMap.get(date));
+//                }
+//            }
+//
+//            // Step 5: Create chart
+//            TimeSeriesCollection dataset = new TimeSeriesCollection();
+//            dataset.addSeries(pre);
+//            dataset.addSeries(post);
+//
+//            JFreeChart chart = ChartFactory.createTimeSeriesChart(
+//                    "Simulated Nutrient Change Over Time",
+//                    "Date",
+//                    currentNutrient + " (grams)",
+//                    dataset,
+//                    true,
+//                    true,
+//                    false);
+//
+//            ChartPanel timePanel = new ChartPanel(chart);
+//            JFrame frame = new JFrame("Before vs After Nutrient Impact");
+//            frame.setSize(800, 400);
+//            frame.setLocationRelativeTo(this);
+//            frame.add(timePanel);
+//            frame.setVisible(true);
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//    }
+
+    private void showBeforeAfterCharts(int oldFoodId, int newFoodId) {
+        TimeSeries pre = new TimeSeries("After Swap");
+        TimeSeries post = new TimeSeries("Before Swap");
+
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.DAY_OF_MONTH, -15); // Start 15 days ago
+
+        for (int i = 0; i < 15; i++) {
+            cal.add(java.util.Calendar.DAY_OF_MONTH, 1);
+            java.util.Date utilDate = cal.getTime();
+            Day day = new Day(utilDate);
+
+            // Deterministic values:
+            // Before: start at 250g, increase by 0.5g per day
+            double beforeValue = 250 + 0.5 * i;
+
+            // After: fixed 90% of beforeValue to simulate a reduction
+            double afterValue = beforeValue * 0.7;
+
+            pre.addOrUpdate(day, beforeValue);
+            post.addOrUpdate(day, afterValue);
+        }
+
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        dataset.addSeries(pre);
+        dataset.addSeries(post);
+
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                "Simulated Nutrient Change Over Time",
+                "Date",
+                currentNutrient + " (grams)",
+                dataset,
+                true,
+                true,
+                false);
+
+        chart.getXYPlot().setBackgroundPaint(Color.WHITE);
+        chart.setBackgroundPaint(Color.WHITE);
+        ChartPanel timePanel = new ChartPanel(chart);
+        JFrame frame = new JFrame("Before vs After Nutrient Impact");
+        frame.setSize(800, 400);
+        frame.setLocationRelativeTo(this);
+        frame.add(timePanel);
+        frame.setVisible(true);
+    }
 
 
 }
