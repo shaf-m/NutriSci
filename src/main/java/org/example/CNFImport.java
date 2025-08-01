@@ -15,7 +15,7 @@ public class CNFImport {
         String folderPath = "data";
         String jdbcURL = "jdbc:mysql://localhost:3306/nutriscidb";
         String username = "root";
-        String password = "";
+        String password = "password";
 
         Map<String, String> fileToTableMap = new HashMap<>();
         fileToTableMap.put("FOOD GROUP.csv", "food_group");

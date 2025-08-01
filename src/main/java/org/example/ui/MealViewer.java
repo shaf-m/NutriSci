@@ -95,28 +95,7 @@ public class MealViewer extends JFrame {
             title.setFont(new Font("SansSerif", Font.BOLD, 14));
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            JTextArea details = new JTextArea(String.format("""
-            Qty: %.2fg
-            Calories: %.2f kcal | Protein: %.2f g | Carbs: %.2f g | Fat: %.2f g
-            Sat Fat: %.2f g | Trans Fat: %.2f g | Sugars: %.2f g | Fiber: %.2f g
-            Cholesterol: %.2f mg | Sodium: %.2f mg | Potassium: %.2f mg
-            Calcium: %.2f mg | Iron: %.2f mg
-            """,
-                    meal.getQuantity(),
-                    meal.getCalories(),
-                    meal.getProtein(),
-                    meal.getCarbohydrates(),
-                    meal.getFat(),
-                    meal.getSaturatedFat(),
-                    meal.getTransFat(),
-                    meal.getSugars(),
-                    meal.getFiber(),
-                    meal.getCholesterol(),
-                    meal.getSodium()/1000,
-                    meal.getPotassium()/1000,
-                    meal.getCalcium()/1000,
-                    meal.getIron()/1000
-            ));
+            JTextArea details = new JTextArea(meal.getDetails());
             details.setFont(new Font("Monospaced", Font.PLAIN, 12));
             details.setEditable(false);
             details.setOpaque(false);
@@ -151,27 +130,7 @@ public class MealViewer extends JFrame {
     }
 
     private JFreeChart createNutrientPieChart(MealLog meal) {
-        DefaultPieDataset dataset = new DefaultPieDataset();
-
-        double protein = meal.getProtein();
-        double carbs = meal.getCarbohydrates();
-        double fat = meal.getFat();
-        double fiber = meal.getFiber();
-        double cholesterol = meal.getCholesterol();
-        double sodium = meal.getSodium();
-
-        double total = protein + carbs + fat + fiber + cholesterol + sodium;
-
-        if (total > 0) {
-            dataset.setValue("Protein", protein);
-            dataset.setValue("Carbohydrates", carbs);
-            dataset.setValue("Fat", fat);
-            dataset.setValue("Fiber", fiber);
-            dataset.setValue("Cholesterol", cholesterol/1000);
-            dataset.setValue("Sodium", sodium/1000);
-        } else {
-            dataset.setValue("No Data", 1);
-        }
+        DefaultPieDataset dataset = meal.getNutrientPieData();
 
         JFreeChart chart = ChartFactory.createPieChart(
                 "Nutrient Composition (g/mg)", dataset, true, true, false

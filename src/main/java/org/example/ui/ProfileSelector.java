@@ -13,10 +13,7 @@ class Dashboard extends JFrame {
 
     public Dashboard(int profileId) {
         this.profileId = profileId;
-        setTitle("NutriSci Dashboard");
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setGeneralSettings();
 
         UserProfile profile = UserProfileDAO.getById(profileId);
 //        System.out.println("Fetched UserProfile: " + (profile != null ? profile.getName() : "null"));
@@ -31,6 +28,26 @@ class Dashboard extends JFrame {
         }
 
 //      Top welcome label
+        JLabel welcomeLabel = makeWelcomeLabel(userName);
+
+        // Card grid container
+        JPanel container = makeContainer();
+
+        // Setup main layout
+        getContentPane().setBackground(new Color(210, 255, 232));
+        setLayout(new BorderLayout());
+        add(welcomeLabel, BorderLayout.NORTH);
+        add(container, BorderLayout.CENTER);
+    }
+
+    private void setGeneralSettings() {
+        setTitle("NutriSci Dashboard");
+        setSize(800, 600);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    private JLabel makeWelcomeLabel(String userName) {
         JLabel welcomeLabel = new JLabel(
                 "<html><div style='text-align:center;'><br>👋<br>Welcome back,<br>" + userName + "!</div></html>",
                 SwingConstants.CENTER
@@ -41,28 +58,7 @@ class Dashboard extends JFrame {
         welcomeLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
         welcomeLabel.setPreferredSize(new Dimension(700, 200));
 
-        // Card grid container
-        JPanel container = new JPanel(new GridLayout(3, 3, 20, 20));
-        container.setBorder(BorderFactory.createEmptyBorder(20, 40, 40, 40));
-        container.setBackground(new Color(210, 255, 232));
-
-        // Add cards
-        container.add(makeCard("<html><div>👤<br>Edit Profile and Goal</div></html>", e -> new ProfileEditor(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>📈<br>View My BMR</div></html>", e -> new BMRWindow(profileId).setVisible(true)));
-//        container.add(makeCard("<html><div>📊<br>Nutrient Chart</div></html>", e -> new NutrientChartWindow().setVisible(true)));
-//        container.add(makeCard("<html><div>📉<br>Compare Intake</div></html>", null));
-        container.add(makeCard("<html><div>📖<br>Log a Meal</div></html>", e -> new MealLogger(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>🍽<br>View Meal Log</div></html>", e -> new MealViewer(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>🏃<br>Log Exercise</div></html>", e -> new ExerciseLogger(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>🏋🏽<br>View Exercise Log</div></html>", e -> new ExerciseViewer(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>🔁<br>Suggest Swaps</div></html>", e -> new SuggestSwap(profileId).setVisible(true)));
-        container.add(makeCard("<html><div>🥗<br>Canada Food Guide</div></html>", e -> new CanadaGuideChart(profileId).setVisible(true)));
-
-        // Setup main layout
-        getContentPane().setBackground(new Color(210, 255, 232));
-        setLayout(new BorderLayout());
-        add(welcomeLabel, BorderLayout.NORTH);
-        add(container, BorderLayout.CENTER);
+        return welcomeLabel;
     }
 
     private JButton makeCard(String title, ActionListener action) {
@@ -92,5 +88,25 @@ class Dashboard extends JFrame {
 
         if (action != null) card.addActionListener(action);
         return card;
+    }
+
+    private JPanel makeContainer() {
+        JPanel container = new JPanel(new GridLayout(3, 3, 20, 20));
+        container.setBorder(BorderFactory.createEmptyBorder(20, 40, 40, 40));
+        container.setBackground(new Color(210, 255, 232));
+
+        // Add cards
+        container.add(makeCard("<html><div>👤<br>Edit Profile and Goal</div></html>", e -> new ProfileEditor(profileId).setVisible(true)));
+        container.add(makeCard("<html><div>📈<br>View My BMR</div></html>", e -> new BMRWindow(profileId).setVisible(true)));
+//        container.add(makeCard("<html><div>📊<br>Nutrient Chart</div></html>", e -> new NutrientChartWindow().setVisible(true)));
+//        container.add(makeCard("<html><div>📉<br>Compare Intake</div></html>", null));
+        container.add(makeCard("<html><div>📖<br>Log a Meal</div></html>", e -> new MealLogger(profileId).setVisible(true)));
+        container.add(makeCard("<html><div>🍽<br>View Meal Log</div></html>", e -> new MealViewer(profileId).setVisible(true)));
+        container.add(makeCard("<html><div>🏃<br>Log Exercise</div></html>", e -> new ExerciseLogger(profileId).setVisible(true)));
+        container.add(makeCard("<html><div>🏋🏽<br>View Exercise Log</div></html>", e -> new ExerciseViewer(profileId).setVisible(true)));
+        container.add(makeCard("<html><div>🔁<br>Suggest Swaps</div></html>", e -> new SuggestSwap(profileId).setVisible(true)));
+        container.add(makeCard("<html><div>🥗<br>Canada Food Guide</div></html>", e -> new CanadaGuideChart(profileId).setVisible(true)));
+
+        return container;
     }
 }

@@ -9,7 +9,7 @@ import java.util.Base64;
 
 public class UserProfileDAO {
     public static UserProfile getById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password")) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM user_profile WHERE ProfileID = ?");
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -31,7 +31,7 @@ public class UserProfileDAO {
         return null;
     }
     public static boolean createAccount(String username, String password) {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password")) {
             String hash = hashPassword(password);
             PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO user_profile (Name, Username, PasswordHash, Sex, DateOfBirth, Height_cm, Weight_kg, Units) " +
@@ -51,7 +51,7 @@ public class UserProfileDAO {
     }
 
     public static boolean authenticate(String username, String password) {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password")) {
             PreparedStatement stmt = conn.prepareStatement(
                     "SELECT PasswordHash FROM user_profile WHERE Username = ?");
             stmt.setString(1, username);
@@ -78,7 +78,7 @@ public class UserProfileDAO {
 
     public static int getProfileId(String username) {
         int profileId = -1;
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ProfileID FROM user_profile WHERE Username = ?")) {
             stmt.setString(1, username);
@@ -94,7 +94,7 @@ public class UserProfileDAO {
 
 
     public static String getUsernameById(int profileId) {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement("SELECT Username FROM user_profile WHERE ProfileID = ?")) {
             stmt.setInt(1, profileId);
             ResultSet rs = stmt.executeQuery();

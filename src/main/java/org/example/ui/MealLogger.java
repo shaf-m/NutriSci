@@ -18,11 +18,22 @@ public class MealLogger extends JFrame {
     public MealLogger(int profileId) {
         centralDAO = centralDAO.getInstance();
         this.profileId = profileId;
+
+        setGeneralSettings();
+
+        JPanel panel = makePanel();
+
+        add(panel);
+    }
+
+    private void setGeneralSettings() {
         setTitle("Log a Meal");
         setSize(500, 380);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    }
 
+    private JPanel makePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(210, 255, 232));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -35,14 +46,13 @@ public class MealLogger extends JFrame {
         JTextField dateField = new JTextField(LocalDate.now().toString());
         JComboBox<String> mealBox = new JComboBox<>(new String[]{"Breakfast", "Lunch", "Dinner", "Snack"});
         JTextField searchField = new JTextField();
-        searchField.setPreferredSize(new Dimension(250, 30));
         JButton searchButton = new JButton("🔍");
         JComboBox<String> resultsBox = new JComboBox<>();
         JTextField qtyField = new JTextField();
         JLabel status = new JLabel();
         JButton saveButton = new JButton("Log Meal");
-
         Map<String, Integer> foodMap = new HashMap<>();
+
 
         // Search logic
         searchButton.addActionListener(e -> {
@@ -56,59 +66,24 @@ public class MealLogger extends JFrame {
             }
         });
 
-        // Row 1: Date
-        panel.add(new JLabel("Date:"), gbc);
-        gbc.gridx = 1;
-        panel.add(dateField, gbc);
 
-        // Row 2: Meal Type
-        gbc.gridx = 0;
-        gbc.gridy++;
-        panel.add(new JLabel("Meal Type:"), gbc);
-        gbc.gridx = 1;
-        panel.add(mealBox, gbc);
+        addDateToPanel(panel, gbc, dateField);
 
-        // Row 3: Search Food + Icon
-        gbc.gridx = 0;
-        gbc.gridy++;
-        panel.add(new JLabel("Search Food:"), gbc);
-        gbc.gridx = 1;
-        JPanel searchPanel = new JPanel(new BorderLayout());
-        searchPanel.setBackground(new Color(210, 255, 232));
-        searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(searchButton, BorderLayout.EAST);
-        panel.add(searchPanel, gbc);
+        addMealTypeToPanel(panel, gbc, mealBox);
 
-        // Row 4: Search Result Dropdown
-        gbc.gridx = 0;
-        gbc.gridy++;
-        panel.add(new JLabel("Select Result:"), gbc);
-        gbc.gridx = 1;
-        panel.add(resultsBox, gbc);
+        addSearchFoodToPanel(panel, gbc, searchField, searchButton);
 
-        // Row 5: Quantity
-        gbc.gridx = 0;
-        gbc.gridy++;
-        panel.add(new JLabel("Quantity (g/ml):"), gbc);
-        gbc.gridx = 1;
-        panel.add(qtyField, gbc);
+        addSearchResultToPanel(panel, gbc, resultsBox);
 
-        // Row 6: Save Button
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 2;
-        saveButton.setBackground(new Color(46, 204, 113));
-        saveButton.setForeground(Color.black);
-        saveButton.setFocusPainted(false);
-        panel.add(saveButton, gbc);
+        addQuantityToPanel(panel, gbc, qtyField);
 
-        // Row 7: Status
-        gbc.gridy++;
-        panel.add(status, gbc);
+        addSaveButtonToPanel(panel, gbc, saveButton);
+
+        addStatusToPanel(panel, gbc, status);
 
         saveButton.addActionListener(e -> {
             try {
-                Date date = Date.valueOf(dateField.getText().trim());
+                Date date = Date.valueOf(LocalDate.now().toString().trim());
                 String mealType = (String) mealBox.getSelectedItem();
                 String selectedFood = (String) resultsBox.getSelectedItem();
                 if (!foodMap.containsKey(selectedFood)) {
@@ -127,6 +102,64 @@ public class MealLogger extends JFrame {
             }
         });
 
-        add(panel);
+        return panel;
+    }
+
+    private void addDateToPanel(JPanel panel, GridBagConstraints gbc, JTextField dateField) {
+        panel.add(new JLabel("Date:"), gbc);
+        gbc.gridx = 1;
+        panel.add(dateField, gbc);
+    }
+
+    private void addMealTypeToPanel(JPanel panel, GridBagConstraints gbc, JComboBox<String> mealBox) {
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Meal Type:"), gbc);
+        gbc.gridx = 1;
+        panel.add(mealBox, gbc);
+    }
+
+    private void addSearchFoodToPanel(JPanel panel, GridBagConstraints gbc, JTextField searchField, JButton searchButton) {
+        searchField.setPreferredSize(new Dimension(250, 30));
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Search Food:"), gbc);
+        gbc.gridx = 1;
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.setBackground(new Color(210, 255, 232));
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(searchButton, BorderLayout.EAST);
+        panel.add(searchPanel, gbc);
+    }
+
+    private void addSearchResultToPanel(JPanel panel, GridBagConstraints gbc, JComboBox<String> resultsBox) {
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Select Result:"), gbc);
+        gbc.gridx = 1;
+        panel.add(resultsBox, gbc);
+    }
+
+    private void addQuantityToPanel(JPanel panel, GridBagConstraints gbc, JTextField qtyField) {
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Quantity (g/ml):"), gbc);
+        gbc.gridx = 1;
+        panel.add(qtyField, gbc);
+    }
+
+    private void addSaveButtonToPanel(JPanel panel, GridBagConstraints gbc, JButton saveButton) {
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        saveButton.setBackground(new Color(46, 204, 113));
+        saveButton.setForeground(Color.black);
+        saveButton.setFocusPainted(false);
+        panel.add(saveButton, gbc);
+    }
+
+    private void addStatusToPanel(JPanel panel, GridBagConstraints gbc, JLabel status) {
+        gbc.gridy++;
+        panel.add(status, gbc);
     }
 }

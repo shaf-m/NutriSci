@@ -9,7 +9,7 @@ public class CNFTestQuery {
     public static void main(String[] args) {
         try {
             System.out.println("Import complete. 1");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
             System.out.println("Import complete. 2");
             CNFImporter importer = new CNFImporter(conn);
             System.out.println("Import complete. 3");

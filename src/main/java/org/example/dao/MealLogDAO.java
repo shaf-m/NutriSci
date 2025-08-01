@@ -17,7 +17,7 @@ public class MealLogDAO {
     }
 
     public void insertMeal(int profileId, java.util.Date mealDate, String type, int foodId, double quantity) {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO meal_log (ProfileID, MealDate, MealType, FoodID, Quantity) VALUES (?, ?, ?, ?, ?)")) {
             stmt.setInt(1, profileId);
@@ -33,7 +33,7 @@ public class MealLogDAO {
 
     public List<MealLog> getMealsByProfile(int profileId) {
         List<MealLog> meals = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ml.*, fn.FoodDescription FROM meal_log ml " +
                              "JOIN food_name fn ON ml.FoodID = fn.FoodID " +

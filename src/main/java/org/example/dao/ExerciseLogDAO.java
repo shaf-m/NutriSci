@@ -14,7 +14,7 @@ public class ExerciseLogDAO {
     }
 
     public void logExercise(ExerciseLog log) throws Exception {
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
         String sql = "INSERT INTO exercise_log (ProfileID, ExerciseDate, ExerciseType, DurationMinutes, CaloriesBurned) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setInt(1, log.getProfileId());
@@ -28,7 +28,7 @@ public class ExerciseLogDAO {
 
     public List<ExerciseLog> getLogsByProfile(int profileId) throws Exception {
         List<ExerciseLog> logs = new ArrayList<>();
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
         String sql = "SELECT * FROM exercise_log WHERE ProfileID = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setInt(1, profileId);

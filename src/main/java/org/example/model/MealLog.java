@@ -1,5 +1,7 @@
 package org.example.model;
 
+import org.jfree.data.general.DefaultPieDataset;
+
 import java.sql.Date;
 
 public class MealLog extends HealthLog{
@@ -76,4 +78,48 @@ public class MealLog extends HealthLog{
 
     public double getIron() { return iron; }
     public void setIron(double iron) { this.iron = iron; }
+
+    public String getDetails() {
+        return String.format("""
+            Qty: %.2fg
+            Calories: %.2f kcal | Protein: %.2f g | Carbs: %.2f g | Fat: %.2f g
+            Sat Fat: %.2f g | Trans Fat: %.2f g | Sugars: %.2f g | Fiber: %.2f g
+            Cholesterol: %.2f mg | Sodium: %.2f mg | Potassium: %.2f mg
+            Calcium: %.2f mg | Iron: %.2f mg
+            """,
+                this.getQuantity(),
+                this.getCalories(),
+                this.getProtein(),
+                this.getCarbohydrates(),
+                this.getFat(),
+                this.getSaturatedFat(),
+                this.getTransFat(),
+                this.getSugars(),
+                this.getFiber(),
+                this.getCholesterol(),
+                this.getSodium()/1000,
+                this.getPotassium()/1000,
+                this.getCalcium()/1000,
+                this.getIron()/1000
+        );
+    }
+
+    public DefaultPieDataset getNutrientPieData() {
+        DefaultPieDataset dataset = new DefaultPieDataset();
+
+        double total = protein + carbohydrates + fat + fiber + cholesterol + sodium;
+
+        if (total > 0) {
+            dataset.setValue("Protein", protein);
+            dataset.setValue("Carbohydrates", carbohydrates);
+            dataset.setValue("Fat", fat);
+            dataset.setValue("Fiber", fiber);
+            dataset.setValue("Cholesterol", cholesterol/1000);
+            dataset.setValue("Sodium", sodium/1000);
+        } else {
+            dataset.setValue("No Data", 1);
+        }
+
+        return dataset;
+    }
 }

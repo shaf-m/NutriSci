@@ -9,7 +9,10 @@ import java.awt.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+
+import static java.util.Map.entry;
 
 public class CanadaGuideChart extends JFrame {
     private int profileId;
@@ -124,7 +127,7 @@ public class CanadaGuideChart extends JFrame {
     private void loadMealDates() {
         Set<String> dates = new LinkedHashSet<>();
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT DISTINCT MealDate FROM meal_log WHERE ProfileID = ? ORDER BY MealDate DESC")) {
             stmt.setInt(1, profileId);
@@ -167,7 +170,24 @@ public class CanadaGuideChart extends JFrame {
 
         double vegFruits = 0, protein = 0, grains = 0, total = 0;
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        Map<Integer, String> groupMap = Map.ofEntries(
+                entry(9, "vegFruits"),
+                entry(11, "vegFruits"),
+                entry(8, "grains"),
+                entry(18, "grains"),
+                entry(20, "grains"),
+                entry(1, "protein"),
+                entry(5, "protein"),
+                entry(10, "protein"),
+                entry(12, "protein"),
+                entry(13, "protein"),
+                entry(15, "protein"),
+                entry(16, "protein"),
+                entry(17, "protein")
+
+        );
+
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT fn.FoodGroupID, ml.Quantity " +
                              "FROM meal_log ml " +
@@ -182,14 +202,25 @@ public class CanadaGuideChart extends JFrame {
                 double quantity = rs.getDouble("Quantity");
                 total += quantity;
 
-                if (groupId == 9 || groupId == 11) {
-                    vegFruits += quantity;
-                } else if (groupId == 8 || groupId == 18 || groupId == 20) {
-                    grains += quantity;
-                } else if (groupId == 1 || groupId == 5 || groupId == 10 ||
-                        groupId == 12 || groupId == 13 || groupId == 15 ||
-                        groupId == 16 || groupId == 17) {
-                    protein += quantity;
+                String category = groupMap.get(groupId);
+
+                if (category != null) {
+                    switch (category) {
+                        case "vegFruits":
+                            vegFruits += quantity;
+                            break;
+                        case "grains":
+                            grains += quantity;
+                            break;
+                        case "protein":
+                            protein += quantity;
+                            break;
+                        default: {
+                            // Handle unexpected category just in case
+                            System.out.println("Unknown category: " + category);
+                            break;
+                        }
+                    }
                 }
             }
         } catch (Exception ex) {

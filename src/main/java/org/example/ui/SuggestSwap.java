@@ -141,7 +141,7 @@ public class SuggestSwap extends JFrame {
     }
 
     private void loadGoal() {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT goal_type, nutrient, goal_amount FROM user_profile WHERE ProfileID = ?")) {
             stmt.setInt(1, profileId);
@@ -159,7 +159,7 @@ public class SuggestSwap extends JFrame {
     }
 
     private void loadMeals() {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ml.MealID, ml.MealDate, ml.MealType, GROUP_CONCAT(fn.FoodDescription SEPARATOR ', ') AS Foods " +
                              "FROM meal_log ml " +
@@ -196,7 +196,7 @@ public class SuggestSwap extends JFrame {
         // Load user goal from DB
         String goalType = "", nutrient = "";
         double targetAmount = 0;
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT goal_type, nutrient, goal_amount FROM user_profile WHERE ProfileID = ?")) {
             stmt.setInt(1, profileId);
@@ -216,7 +216,7 @@ public class SuggestSwap extends JFrame {
 
         // Find NutrientID
         int nutrientId = -1;
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT NutrientID FROM nutrient_name WHERE NutrientName LIKE ?")) {
             stmt.setString(1, nutrient + "%");
@@ -237,7 +237,7 @@ public class SuggestSwap extends JFrame {
 
         // Calculate total amount of the nutrient in the current meal
         double oldMealNutrientTotal = 0;
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT SUM(na.NutrientValue * ml.Quantity / 100) AS totalNutrient " +
                              "FROM meal_log ml " +
@@ -296,7 +296,7 @@ public class SuggestSwap extends JFrame {
 
         // Only handle "increase" goals for combined suggestions here
         if (goalType.equalsIgnoreCase("increase")) {
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
                  PreparedStatement stmt = conn.prepareStatement(
                          "SELECT f.FoodDescription, n.NutrientValue " +
                                  "FROM food_name f " +
@@ -329,7 +329,7 @@ public class SuggestSwap extends JFrame {
             }
         } else {
             // Handle decrease or other goal types - fallback to original 5 food suggestions
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
                  PreparedStatement stmt = conn.prepareStatement(
                          "SELECT f.FoodDescription, n.NutrientValue " +
                                  "FROM food_name f " +
@@ -416,7 +416,7 @@ public class SuggestSwap extends JFrame {
         int oldFoodId = -1, newFoodId = -1;
         double maxValue = 0;
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT FoodID FROM meal_log WHERE MealID = ?")) {
             stmt.setInt(1, originalMealId);
@@ -435,7 +435,7 @@ public class SuggestSwap extends JFrame {
         }
 
         // Find best suggested food from current suggestion (hardcoded again, ideally store selection)
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT na.FoodID, na.NutrientValue FROM nutrient_amount na " +
                              "WHERE na.NutrientID = (SELECT NutrientID FROM nutrient_name WHERE NutrientName LIKE ?) " +
@@ -461,7 +461,7 @@ public class SuggestSwap extends JFrame {
             sql += " AND MealDate BETWEEN ? AND ?";
         }
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, newFoodId);
@@ -486,7 +486,7 @@ public class SuggestSwap extends JFrame {
     }
 
     private void logSwap(int profileId, int oldFoodId, int newFoodId) {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/nutriscidb", "root", "password");
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO swap_log (ProfileID, OldFoodID, NewFoodID, MealDate) VALUES (?, ?, ?, NOW())")) {
             stmt.setInt(1, profileId);
