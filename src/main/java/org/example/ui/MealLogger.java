@@ -19,7 +19,7 @@ public class MealLogger extends JFrame {
         centralDAO = centralDAO.getInstance();
         this.profileId = profileId;
         setTitle("Log a Meal");
-        setSize(500, 380);
+        setSize(800, 380);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 

@@ -26,6 +26,7 @@ public class ProfileForm extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new GridLayout(10, 2, 10, 10)); // updated layout
+        panel.setBackground(new Color(210, 255, 232));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         nameField = new JTextField(username != null ? username : "");
